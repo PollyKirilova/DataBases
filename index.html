@@ -115,8 +115,9 @@
 <body>
 
 <header>
-    <h1>💾 Властелините на Данните</h1>
-    <p class="subtitle">Интерактивен урок за 11. клас: INSERT, SELECT, UPDATE, DELETE</p>
+    <h1>CRUD Операции </h1>
+    <h3>Властелините на Данните <br> INSERT, SELECT, UPDATE, DELETE</h3>
+    <p class="subtitle">Интерактивен урок за 11. клас по дисциплината Бази данни </p>
 </header>
 
 <div class="container">
@@ -138,7 +139,7 @@
         <p>Трябва да добавим нов програмист в системата.</p>
         
         <div class="task-box">
-            <strong>Задача:</strong> Напишете SQL заявка, за да добавите следния служител в таблица <code>employees</code>:<br>
+            <strong>Задача:</strong> Напишете SQL заявка, за да добавите следния служител в таблица <code>employees</code>със следните колони: <code>first_name, last_name, job_title, department, salary</code>:<br>
             <em>Ivan Ivanov, .NET Developer, Software Development, заплата 3500.00</em>
         </div>
 
@@ -196,8 +197,8 @@
 </div>
 
 <footer>
-    <p>Национална програма "Обучение за ИТ кариера" - МОН. Лиценз: CC-BY-NC-SA.</p>
-    <p>Съдържанието е базирано на материали от Софтуерен Университет.</p>
+    <p>Национална програма "Обучение за ИТ кариера" - МОН. Лиценз: CC-BY-NC-SA</p>
+    <p>Съдържанието е изготвено от инж. Полина Кирилова, базирано на материали от Софтуерен Университет.</p>
 </footer>
 
 <script>
@@ -224,7 +225,48 @@
     function checkInsert() {
         const input = normalize(document.getElementById('input-insert').value);
         // Проверка за ключови думи от source: 6
-        if (input.includes('insert into employees') && input.includes('values') && input.includes('ivan')) {
+        if (input.includes('insert into employees') && input.includes('values') && input.includes('Ivan', 'Ivanov', '.NET Developer', 'Software Development', 3500.00) && input.includes(';')) {
             showResult('result-insert', true, 'Успешно добавихте Ivan Ivanov в базата данни! (Query OK, 1 row affected)');
         } else {
-            showResult('result-insert', false, 'Синтаксисът не
+            showResult('result-insert', false, 'Синтаксисът не е верен или липсват данни. Проверете дали използвате INSERT INTO и правилните имена.');
+        }
+    }
+
+    function checkSelect() {
+        const input = normalize(document.getElementById('input-select').value);
+        // Проверка за ключови думи от source: 16
+        if (input.includes('select') && input.includes('first_name') && input.includes('salary') && input.includes('from employees')) {
+            showResult('result-select', true, 'Заявката върна резултат! Виждате имената и заплатите на служителите.');
+        } else {
+            showResult('result-select', false, 'Уверете се, че сте избрали точните колони (first_name, last_name, job_title, salary) от employees.');
+        }
+    }
+
+    function checkUpdate() {
+        const input = normalize(document.getElementById('input-update').value);
+        // Проверка за ключови думи от source: 19
+        // Търсим умножение по 1.1 или 1.10 или събиране с 10%
+        if (input.includes('update employees') && input.includes('set salary') && (input.includes('* 1.1') || input.includes('*1.1'))) {
+            showResult('result-update', true, 'Заплатите са актуализирани! Служителите са доволни. (Rows matched: 5, Changed: 5)');
+        } else if (input.includes('where')) {
+             showResult('result-update', false, 'В задачата се иска промяна на ВСИЧКИ служители. Не използвайте WHERE тук.');
+        } else {
+            showResult('result-update', false, 'Грешка в логиката. Използвайте: UPDATE table SET column = column * 1.1');
+        }
+    }
+
+    function checkDelete() {
+        const input = normalize(document.getElementById('input-delete').value);
+        // Проверка за ключови думи от source: 27
+        if ((input.includes('delete from occupancies') || input.includes('truncate table occupancies')) && !input.includes('where')) {
+            showResult('result-delete', true, 'Таблицата occupancies беше успешно изчистена. Всички данни са изтрити!');
+        } else if (input.includes('where')) {
+            showResult('result-delete', false, 'Задачата е да изтриете ВСИЧКИ записи, WHERE не е необходим.');
+        } else {
+            showResult('result-delete', false, 'Опитайте с DELETE FROM occupancies');
+        }
+    }
+</script>
+
+</body>
+</html>
