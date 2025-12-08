@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Интерактивен Урок: CRUD Операции</title>
+    <style>
+        :root {
+            --bg-color: #1e1e2e;
+            --card-bg: #2b2b3b;
+            --text-color: #e0e0e0;
+            --accent-blue: #61dafb;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --code-bg: #15151a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-blue);
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; color: var(--accent-blue); }
+        h2 { color: var(--accent-blue); border-bottom: 1px solid #444; padding-bottom: 0.5rem; }
+        .subtitle { font-style: italic; opacity: 0.8; }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border-left: 5px solid var(--accent-blue);
+        }
+
+        .card.success { border-left-color: var(--accent-green); }
+        .card.error { border-left-color: var(--accent-red); }
+
+        .task-box {
+            background-color: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .editor-area {
+            width: 100%;
+            height: 120px;
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .btn {
+            background-color: var(--accent-blue);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-top: 10px;
+            transition: transform 0.1s;
+        }
+
+        .btn:hover { transform: scale(1.05); background-color: #4fa8c7; }
+        .btn-delete { background-color: var(--accent-red); color: white; }
+
+        .result-console {
+            background-color: #000;
+            color: var(--accent-green);
+            font-family: monospace;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: none;
+            border: 1px solid #333;
+        }
+
+        .hint { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
+        code { background-color: #444; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>💾 Властелините на Данните</h1>
+    <p class="subtitle">Интерактивен урок за 11. клас: INSERT, SELECT, UPDATE, DELETE</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>👋 Въведение: CRUD Магията</h2>
+        <p>Днес вие сте администратори на базата данни на <strong>SoftUni</strong>. Вашата задача е да управлявате информацията за служителите и отделите.</p>
+        <p>Ще използваме четири основни магии (операции):</p>
+        <ul>
+            <li><strong>Create (INSERT):</strong> Създаване на нови записи.</li>
+            <li><strong>Read (SELECT):</strong> Четене на данни.</li>
+            <li><strong>Update (UPDATE):</strong> Промяна на съществуващи данни.</li>
+            <li><strong>Delete (DELETE):</strong> Изтриване на данни.</li>
+        </ul>
+    </div>
+
+    <div class="card" id="card-insert">
+        <h2>1. Наемане на служители (INSERT)</h2>
+        <p>Трябва да добавим нов програмист в системата.</p>
+        
+        <div class="task-box">
+            <strong>Задача:</strong> Напишете SQL заявка, за да добавите следния служител в таблица <code>employees</code>:<br>
+            <em>Ivan Ivanov, .NET Developer, Software Development, заплата 3500.00</em>
+        </div>
+
+        <textarea id="input-insert" class="editor-area" placeholder="Напишете вашия SQL код тук...&#10;Пример: INSERT INTO employees ..."></textarea>
+        <div class="hint">💡 Подсказка: Използвайте INSERT INTO ... VALUES (...)</div>
+        
+        <button class="btn" onclick="checkInsert()">▶ Изпълни заявката</button>
+        <div id="result-insert" class="result-console"></div>
+    </div>
+
+    <div class="card" id="card-select">
+        <h2>2. Доклад за шефа (SELECT)</h2>
+        <p>Шефът иска списък със служителите, но само определена информация.</p>
+        
+        <div class="task-box">
+            <strong>Задача:</strong> Изберете <strong>само</strong> колоните <code>first_name</code>, <code>last_name</code>, <code>job_title</code> и <code>salary</code> от таблица <code>employees</code>.
+        </div>
+
+        <textarea id="input-select" class="editor-area" placeholder="SELECT ... FROM ..."></textarea>
+        
+        <button class="btn" onclick="checkSelect()">▶ Изпълни заявката</button>
+        <div id="result-select" class="result-console"></div>
+    </div>
+
+    <div class="card" id="card-update">
+        <h2>3. Увеличение на заплатите (UPDATE)</h2>
+        <p>Фирмата има добра година! Време е да актуализираме заплатите.</p>
+        
+        <div class="task-box">
+            <strong>Задача:</strong> Увеличете заплатата (<code>salary</code>) на <strong>всички</strong> служители с 10%.
+        </div>
+
+        <textarea id="input-update" class="editor-area" placeholder="UPDATE employees SET ..."></textarea>
+        <div class="hint">💡 Подсказка: Новата заплата е старата * 1.1</div>
+        
+        <button class="btn" onclick="checkUpdate()">▶ Изпълни заявката</button>
+        <div id="result-update" class="result-console"></div>
+    </div>
+
+    <div class="card" id="card-delete">
+        <h2>4. Почистване на базата (DELETE)</h2>
+        <p>Сезонът в хотела приключи. Мениджърът иска да изтрием записите за заетост.</p>
+        
+        <div class="task-box">
+            <strong>Задача:</strong> Изтрийте всички записи от таблица <code>occupancies</code>.
+        </div>
+
+        <textarea id="input-delete" class="editor-area" placeholder="DELETE FROM ..."></textarea>
+        <div class="hint">💡 Внимание: Тази операция е необратима!</div>
+        
+        <button class="btn btn-delete" onclick="checkDelete()">🗑️ ИЗТРИЙ ЗАПИСИТЕ</button>
+        <div id="result-delete" class="result-console"></div>
+    </div>
+
+</div>
+
+<footer>
+    <p>Национална програма "Обучение за ИТ кариера" - МОН. Лиценз: CC-BY-NC-SA.</p>
+    <p>Съдържанието е базирано на материали от Софтуерен Университет.</p>
+</footer>
+
+<script>
+    // Помощна функция за нормализиране на текста (премахва нови редове и излишни интервали)
+    function normalize(text) {
+        return text.toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function showResult(elementId, success, message) {
+        const consoleDiv = document.getElementById(elementId);
+        consoleDiv.style.display = 'block';
+        consoleDiv.style.color = success ? '#2ecc71' : '#e74c3c';
+        consoleDiv.innerHTML = (success ? '✔ УСПЕХ: ' : '❌ ГРЕШКА: ') + message;
+        
+        // Анимация на картата
+        const card = consoleDiv.parentElement;
+        if(success) {
+            card.style.borderLeftColor = '#2ecc71';
+        } else {
+            card.style.borderLeftColor = '#e74c3c';
+        }
+    }
+
+    function checkInsert() {
+        const input = normalize(document.getElementById('input-insert').value);
+        // Проверка за ключови думи от source: 6
+        if (input.includes('insert into employees') && input.includes('values') && input.includes('ivan')) {
+            showResult('result-insert', true, 'Успешно добавихте Ivan Ivanov в базата данни! (Query OK, 1 row affected)');
+        } else {
+            showResult('result-insert', false, 'Синтаксисът не
