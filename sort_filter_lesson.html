@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Урок: Сортиране и Филтриране</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --light-bg: #f4f6f7;
+            --code-bg: #2d2d2d;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 3rem;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--accent-color);
+            margin-top: 1.5rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--light-bg);
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+        }
+
+        code {
+            color: #e74c3c;
+            background-color: #f9f2f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        pre code {
+            color: inherit;
+            background-color: transparent;
+            padding: 0;
+        }
+
+        /* Interactive Quiz */
+        .quiz-container {
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .options label {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .options label:hover {
+            background-color: #eaf2f8;
+        }
+
+        .options input {
+            margin-right: 10px;
+        }
+
+        #quiz-feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Exercises */
+        .exercise-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        .exercise-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .db-label {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 10px;
+            color: white;
+        }
+
+        .Company { background-color: #9b59b6; }
+        .db-geo { background-color: #27ae60; }
+
+        .reveal-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .answer-box {
+            display: none;
+            margin-top: 10px;
+            background-color: #f8f9fa;
+            border-left: 3px solid #2ecc71;
+            padding: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Форматиране на заявки в SQL</h1>
+    <p>Интерактивен урок: Сортиране, Псевдоними и Филтриране</p>
+</header>
+
+<div class="container">
+
+    <section id="theory">
+        <h2>1. Теория и Примери</h2>
+        <p>В този урок ще разгледаме как да представяме резултатите от нашите заявки по по-четим и подреден начин.</p>
+
+        <h3>1.1. Псевдоними (Aliases)</h3>
+        <p>Псевдонимите дават временно ново име на таблица или колона, за да стане резултатът по-ясен. Използва се ключовата дума <code>AS</code>.</p>
+        <pre><code>SELECT first_name AS "Име", last_name AS "Фамилия" 
+FROM employees;</code></pre>
+        <p><em>Забележка:</em> <code>AS</code> може да се пропусне, но с него кодът е по-четим.</p>
+
+        <h3>1.2. Сортиране (ORDER BY)</h3>
+        <p>Сортирането подрежда резултатите по определен критерий. </p>
+        <ul>
+            <li><code>ASC</code> (Ascending) - възходящ ред (по подразбиране). От А до Я или от 0 до 9.</li>
+            <li><code>DESC</code> (Descending) - низходящ ред. От Я до А или от 9 до 0.</li>
+        </ul>
+        
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+                <strong>Примерна таблица (employees):</strong>
+                <table>
+                    <tr><th>id</th><th>name</th><th>salary</th></tr>
+                    <tr><td>1</td><td>Ivan</td><td>2000</td></tr>
+                    <tr><td>2</td><td>Maria</td><td>2500</td></tr>
+                    <tr><td>3</td><td>Peter</td><td>1800</td></tr>
+                </table>
+            </div>
+            <div style="flex: 1; min-width: 300px;">
+                <strong>Заявка:</strong>
+                <pre><code>SELECT * FROM employees 
+ORDER BY salary DESC;</code></pre>
+                <strong>Резултат:</strong>
+                <table>
+                    <tr><th>id</th><th>name</th><th>salary</th></tr>
+                    <tr><td>2</td><td>Maria</td><td>2500</td></tr>
+                    <tr><td>1</td><td>Ivan</td><td>2000</td></tr>
+                    <tr><td>3</td><td>Peter</td><td>1800</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <h3>1.3. Ограничаване (LIMIT)</h3>
+        <p>Използваме <code>LIMIT</code>, когато искаме да видим само част от резултатите (например "Топ 3 най-богати служители").</p>
+        <pre><code>SELECT * FROM employees 
+ORDER BY salary DESC 
+LIMIT 1; -- Връща само най-високата заплата</code></pre>
+    </section>
+
+    <section id="quiz">
+        <h2>2. Проверка на знанията</h2>
+        <div class="quiz-container">
+            <p><strong>Въпрос:</strong> Ако искате да сортирате служителите по заплата от най-високата към най-ниската, коя ключова дума трябва да използвате след името на колоната?</p>
+            
+            <div class="options">
+                <label>
+                    <input type="radio" name="q1" value="a"> ASC
+                </label>
+                <label>
+                    <input type="radio" name="q1" value="b"> DESC
+                </label>
+                <label>
+                    <input type="radio" name="q1" value="c"> LIMIT
+                </label>
+            </div>
+            
+            <button onclick="checkQuiz()" style="margin-top: 15px; padding: 10px 20px; background: var(--primary-color); color: white; border: none; cursor: pointer;">Провери отговор</button>
+            <div id="quiz-feedback"></div>
+        </div>
+    </section>
+
+    
+
+</div>
+
+<footer>
+    <p>© 2026 Бази данни. инж. Полина Михова</p>
+</footer>
+
+<script>
+    function checkQuiz() {
+        const options = document.getElementsByName('q1');
+        let selectedValue = null;
+        for (const option of options) {
+            if (option.checked) {
+                selectedValue = option.value;
+                break;
+            }
+        }
+
+        const feedback = document.getElementById('quiz-feedback');
+        feedback.style.display = 'block';
+
+        if (selectedValue === 'b') {
+            feedback.textContent = "✅ Правилно! DESC (Descending) сортира в низходящ ред.";
+            feedback.className = "correct";
+        } else if (selectedValue === 'a') {
+            feedback.textContent = "❌ Грешно. ASC (Ascending) сортира във възходящ ред.";
+            feedback.className = "incorrect";
+        } else if (selectedValue === 'c') {
+            feedback.textContent = "❌ Грешно. LIMIT ограничава броя записи, не ги сортира.";
+            feedback.className = "incorrect";
+        } else {
+            feedback.textContent = "⚠️ Моля, изберете отговор.";
+            feedback.className = "";
+        }
+    }
+
+    function toggleAnswer(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === 'block') {
+            el.style.display = 'none';
+        } else {
+            el.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
