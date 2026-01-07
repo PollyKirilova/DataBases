@@ -178,30 +178,50 @@
         </div>
 
         <div class="lesson-card">
-            <h3>💾 SQL – основни заявки</h3>
+            <h3>📘 SQL – основни заявки</h3>
             <a href="index.html">Отвори урока</a>
+        </div>
+		<div class="lesson-card">
+            <h3>🧠 CRUD операции</h3>
+            <a href="crud.html">Отвори урока</a>
         </div>
 		 <div class="lesson-card">
             <h3>📊 Сортиране и филтриране</h3>
             <a href="sort_filter_lesson.html">Отвори урока</a>
         </div>
-		 <div class="lesson-card">
-            <h3>🧠 CRUD операции</h3>
-            <a href="crud.html">Отвори урока</a>
+		<div class="lesson-card">
+            <h3>💾 Подзаявки </h3>
+            <a href="subqueries_lesson.html">Отвори урока</a>
         </div>
 		 <div class="lesson-card">
             <h3>🔗 Връзки между таблици </h3>
             <a href="index.html">Отвори урока</a>
         </div>
+
+		
     </section>
 </main>
 
 <footer>
-    Създадено с <span>❤</span> от <strong>инж. Полина Михова</strong><br>
+    Създадено с <span>❤</span> от <strong>инж. Полина Кирилова</strong><br>
     Интерактивни уроци по Бази данни – 11 клас
 </footer>
+<script>
+    function toggleTheme() {
+        document.body.classList.toggle("dark");
+        localStorage.setItem(
+            "theme",
+            document.body.classList.contains("dark") ? "dark" : "light"
+        );
+    }
 
+    // Зареждане на избраната тема
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+    }
+</script>
 </body>
 </html>
+
 
 
