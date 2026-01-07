@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Урок: Подзаявки (Subqueries)</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e67e22; /* Оранжев акцент за по-високо ниво на трудност */
+            --light-bg: #fdfefe;
+            --section-bg: #ffffff;
+            --code-bg: #282c34;
+            --correct-color: #27ae60;
+            --wrong-color: #c0392b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #ecf0f1;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            background: var(--section-bg);
+            margin-bottom: 2rem;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--accent-color);
+        }
+
+        h2 { color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        h3 { color: var(--accent-color); margin-top: 1.5rem; }
+
+        /* Code Styling */
+        pre {
+            background-color: var(--code-bg);
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+            border: 1px solid #3e4451;
+        }
+        
+        .sql-keyword { color: #c678dd; }
+        .sql-func { color: #61afef; }
+        .sql-string { color: #98c379; }
+
+        /* Mini Quiz Card */
+        .mini-quiz {
+            background-color: #fff8e1; /* Светло жълто за задача */
+            border: 1px solid #ffe082;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .mini-quiz h4 { margin-top: 0; color: #f57f17; }
+
+        .quiz-options button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            background: white;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .quiz-options button:hover {
+            background-color: #eee;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            font-weight: bold;
+        }
+        .feedback.correct { background-color: #d4edda; color: #155724; display: block; }
+        .feedback.wrong { background-color: #f8d7da; color: #721c24; display: block; }
+
+        /* Diagram / Visual helper */
+        .diagram {
+            background: #eef2f3;
+            padding: 15px;
+            text-align: center;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SQL Master Class: Подзаявки (Subqueries)</h1>
+    <p>Научете се да влагате заявки една в друга за решаване на сложни проблеми</p>
+</header>
+
+<div class="container">
+
+    <section>
+        <h2>1. Какво е подзаявка?</h2>
+        <p>Подзаявката (Subquery) е <strong>SELECT</strong> заявка, която е "скрита" вътре в друга заявка (обикновено в <code>WHERE</code> клаузата). Тя се изпълнява <strong>първа</strong>, а резултатът ѝ се предава на външната заявка.</p>
+        
+        <div class="diagram">
+            Външна заявка ( Вложена заявка ( Резултат ) -> Обработка ) -> Финален резултат
+        </div>
+    </section>
+
+    <section>
+        <h2>2. Скаларни подзаявки (Връщат една стойност)</h2>
+        <p>Тези подзаявки връщат точно една клетка (един ред и една колона). Например: <em>Каква е средната заплата?</em></p>
+        <p>Използват се със стандартни оператори за сравнение: <code>=</code>, <code>></code>, <code><</code>, <code>>=</code>, <code><=</code>.</p>
+
+        <h3>Пример:</h3>
+        <p>Искаме да намерим всички служители, които взимат <strong>над средната заплата</strong>.</p>
+        <pre><code><span class="sql-keyword">SELECT</span> first_name, salary 
+<span class="sql-keyword">FROM</span> employees 
+<span class="sql-keyword">WHERE</span> salary > (
+    <span class="sql-keyword">SELECT</span> <span class="sql-func">AVG</span>(salary) <span class="sql-keyword">FROM</span> employees
+);</code></pre>
+        
+        <p><em>Обяснение:</em> SQL първо изчислява средната заплата (напр. 5000), и след това външната заявка става: <code>WHERE salary > 5000</code>.</p>
+
+        <div class="mini-quiz" id="quiz1">
+            <h4>🤔 Бърз въпрос:</h4>
+            <p>Ако вътрешната заявка <code>(SELECT AVG(salary)...)</code> върне стойност <strong>2000</strong>, а служителят Иван има заплата <strong>1800</strong>, ще бъде ли включен Иван в резултата при условие <code>WHERE salary > (...)</code>?</p>
+            <div class="quiz-options">
+                <button onclick="checkAnswer('quiz1', 'no')">Не, защото 1800 не е по-голямо от 2000</button>
+                <button onclick="checkAnswer('quiz1', 'yes')">Да, защото е близо до средната</button>
+                <button onclick="checkAnswer('quiz1', 'error')">Ще даде грешка</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. Списъчни подзаявки (Оператор IN)</h2>
+        <p>Тези подзаявки връщат една колона с много редове (списък от стойности). Не можем да използваме <code>=</code> (равно), защото една стойност не може да е равна на цял списък.</p>
+        <p>Затова използваме оператора <code>IN</code> (включено в списъка) или <code>NOT IN</code>.</p>
+
+        <h3>Пример:</h3>
+        <p>Искаме имената на служители, които работят в отдели, намиращи се в <strong>София</strong> (location_id = 100).</p>
+        <pre><code><span class="sql-keyword">SELECT</span> first_name, last_name 
+<span class="sql-keyword">FROM</span> employees 
+<span class="sql-keyword">WHERE</span> department_id <span class="sql-keyword">IN</span> (
+    <span class="sql-keyword">SELECT</span> department_id 
+    <span class="sql-keyword">FROM</span> departments 
+    <span class="sql-keyword">WHERE</span> location_id = 100
+);</code></pre>
+        <p><em>Логика:</em> Подзаявката връща списък (напр. отдели 1, 5 и 10 са в София). Външната заявка търси служители от тези отдели.</p>
+
+        <div class="mini-quiz" id="quiz2">
+            <h4>🤔 Бърз въпрос:</h4>
+            <p>Ако подзаявката връща списък с ID-та: <code>(10, 20, 30)</code>, кой оператор трябва да използвате, за да намерите служители, които НЕ работят в тези отдели?</p>
+            <div class="quiz-options">
+                <button onclick="checkAnswer('quiz2', 'wrong')">!=</button>
+                <button onclick="checkAnswer('quiz2', 'wrong')">IN</button>
+                <button onclick="checkAnswer('quiz2', 'correct')">NOT IN</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>4. Оператори ANY и ALL</h2>
+        <p>Тези оператори се използват, когато сравняваме единична стойност със списък от стойности.</p>
+        <ul>
+            <li><code>> ALL</code>: По-голямо от <strong>всички</strong> числа в списъка (т.е. по-голямо от най-голямото).</li>
+            <li><code>> ANY</code>: По-голямо от <strong>поне едно</strong> число в списъка (т.е. по-голямо от най-малкото).</li>
+        </ul>
+
+        <h3>Пример:</h3>
+        <p>Най-богатите: Заплата по-голяма от заплатата на <strong>всички</strong> служители в отдел "Marketing".</p>
+        <pre><code><span class="sql-keyword">WHERE</span> salary > <span class="sql-keyword">ALL</span> (
+    <span class="sql-keyword">SELECT</span> salary <span class="sql-keyword">FROM</span> employees <span class="sql-keyword">WHERE</span> department = 'Marketing'
+);</code></pre>
+
+        <div class="mini-quiz" id="quiz3">
+            <h4>🤔 Логическа задача:</h4>
+            <p>Имаме списък от числа: <code>(100, 200, 300)</code>.</p>
+            <p>Кое условие е вярно за числото <strong>250</strong>?</p>
+            <div class="quiz-options">
+                <button onclick="checkAnswer('quiz3', 'wrong_all')">250 > ALL (100, 200, 300)</button>
+                <button onclick="checkAnswer('quiz3', 'correct_any')">250 > ANY (100, 200, 300)</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+    </section>
+
+    <section style="background: #eafaf1; border-left-color: #27ae60;">
+        <h2>5. Практическо упражнение (Geography DB)</h2>
+        <p>Сега опитайте да напишете заявка по следното условие, използвайки знанията за подзаявки.</p>
+        
+        <div class="mini-quiz" style="background: white; border: 1px solid #ddd;">
+            <p><strong>Задача:</strong> Намерете имената на държавите (country_name), чиято площ (area_in_sq_km) е равна на най-голямата площ в цялата таблица.</p>
+            <details>
+                <summary style="cursor: pointer; color: var(--accent-color); font-weight: bold;">Виж подсказка</summary>
+                <p>Трябва ви подзаявка: <code>SELECT MAX(area_in_sq_km) FROM countries</code>.</p>
+            </details>
+            <br>
+            <details>
+                <summary style="cursor: pointer; color: var(--correct-color); font-weight: bold;">Виж решение</summary>
+                <pre><code>SELECT country_name 
+FROM countries 
+WHERE area_in_sq_km = (
+    SELECT MAX(area_in_sq_km) 
+    FROM countries
+);</code></pre>
+            </details>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    function checkAnswer(quizId, answer) {
+        const feedbackEl = document.querySelector(`#${quizId} .feedback`);
+        
+        // Логика за Quiz 1
+        if (quizId === 'quiz1') {
+            if (answer === 'no') {
+                feedbackEl.innerHTML = "✅ Правилно! Условието 1800 > 2000 е лъжа (FALSE), затова Иван няма да бъде включен.";
+                feedbackEl.className = "feedback correct";
+            } else {
+                feedbackEl.innerHTML = "❌ Грешно. Сравнението е строго математическо. 1800 не е по-голямо от 2000.";
+                feedbackEl.className = "feedback wrong";
+            }
+        }
+
+        // Логика за Quiz 2
+        if (quizId === 'quiz2') {
+            if (answer === 'correct') {
+                feedbackEl.innerHTML = "✅ Браво! NOT IN проверява дали стойността липсва в списъка.";
+                feedbackEl.className = "feedback correct";
+            } else {
+                feedbackEl.innerHTML = "❌ Грешно. Операторът за отричане на списък е NOT IN.";
+                feedbackEl.className = "feedback wrong";
+            }
+        }
+
+        // Логика за Quiz 3
+        if (quizId === 'quiz3') {
+            if (answer === 'correct_any') {
+                feedbackEl.innerHTML = "✅ Точно така! 250 е по-голямо от 100 и 200 (някои от числата), затова ANY връща TRUE.";
+                feedbackEl.className = "feedback correct";
+            } else if (answer === 'wrong_all') {
+                feedbackEl.innerHTML = "❌ Грешно. За да е вярно ALL, 250 трябва да е по-голямо от ВСИЧКИ (вкл. и 300), а то не е.";
+                feedbackEl.className = "feedback wrong";
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
