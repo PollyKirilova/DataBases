@@ -2,271 +2,204 @@
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
+    <title>Интерактивни уроци по Бази данни – 11 клас</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Интерактивен Урок: CRUD Операции</title>
     <style>
         :root {
-            --bg-color: #1e1e2e;
-            --card-bg: #2b2b3b;
-            --text-color: #e0e0e0;
-            --accent-blue: #61dafb;
-            --accent-green: #2ecc71;
-            --accent-red: #e74c3c;
-            --code-bg: #15151a;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            --bg-main: #ffffff;
+            --text-main: #333;
+            --header-bg: #2c3e50;
+            --card-bg: #ffffff;
+            --button-bg: #3498db;
+            --button-hover: #2980b9;
+            --footer-bg: #2c3e50;
+        }
+
+        body.dark {
+            --bg-gradient: linear-gradient(135deg, #1e1e2f, #121212);
+            --bg-main: #1f1f1f;
+            --text-main: #e0e0e0;
+            --header-bg: #111827;
+            --card-bg: #252525;
+            --button-bg: #6366f1;
+            --button-hover: #4f46e5;
+            --footer-bg: #111827;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
             margin: 0;
-            padding: 0;
-            line-height: 1.6;
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            transition: background 0.3s, color 0.3s;
         }
 
         header {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            padding: 2rem;
+            background-color: var(--header-bg);
+            color: white;
+            padding: 30px 20px;
             text-align: center;
-            border-bottom: 4px solid var(--accent-blue);
+            position: relative;
         }
 
-        h1 { margin: 0; font-size: 2.5rem; color: var(--accent-blue); }
-        h2 { color: var(--accent-blue); border-bottom: 1px solid #444; padding-bottom: 0.5rem; }
-        .subtitle { font-style: italic; opacity: 0.8; }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
         }
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            border-left: 5px solid var(--accent-blue);
+        header p {
+            margin-top: 10px;
+            font-size: 1.1em;
+            opacity: 0.9;
         }
 
-        .card.success { border-left-color: var(--accent-green); }
-        .card.error { border-left-color: var(--accent-red); }
-
-        .task-box {
-            background-color: rgba(255,255,255,0.05);
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-
-        .editor-area {
-            width: 100%;
-            height: 120px;
-            background-color: var(--code-bg);
-            color: #f8f8f2;
-            border: 1px solid #444;
-            border-radius: 5px;
-            padding: 10px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 1rem;
-            resize: vertical;
-        }
-
-        .btn {
-            background-color: var(--accent-blue);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 2px solid white;
+            border-radius: 20px;
+            color: white;
+            padding: 6px 14px;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
-            margin-top: 10px;
-            transition: transform 0.1s;
+            font-size: 0.9em;
         }
 
-        .btn:hover { transform: scale(1.05); background-color: #4fa8c7; }
-        .btn-delete { background-color: var(--accent-red); color: white; }
-
-        .result-console {
-            background-color: #000;
-            color: var(--accent-green);
-            font-family: monospace;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            display: none;
-            border: 1px solid #333;
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
         }
 
-        .hint { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
-        code { background-color: #444; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .intro {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .intro h2 {
+            color: inherit;
+        }
+
+        .intro p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .lessons {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .lesson-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .lesson-card a {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: white;
+            background-color: var(--button-bg);
+            padding: 10px 18px;
+            border-radius: 20px;
+        }
+
+        .lesson-card a:hover {
+            background-color: var(--button-hover);
+        }
 
         footer {
+            margin-top: 60px;
+            background-color: var(--footer-bg);
+            color: white;
             text-align: center;
             padding: 20px;
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 50px;
+            font-size: 0.9em;
+        }
+
+        footer span {
+            color: #ffb6c1;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>CRUD Операции </h1>
-    <h3>Властелините на Данните <br> INSERT, SELECT, UPDATE, DELETE</h3>
-    <p class="subtitle">Интерактивен урок за 11. клас по дисциплината Бази данни </p>
+    <h1>Интерактивни уроци по Бази данни</h1>
+    <p>11. клас • Учи с разбиране • Мисли като програмист</p>
+	    <button class="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</button>
 </header>
 
-<div class="container">
+<main>
+    <section class="intro">
+        <h2>Добре дошли!</h2>
+        <p>
+            Тази платформа е създадена, за да ви помогне да разберете
+            <strong>базите данни</strong> по лесен, логичен и практичен начин.
+            Тук ще откриете уроци, примери, упражнения и интерактивни задачи,
+            които ще ви подготвят за училище и реалния свят.
+        </p>
+        <p>
+            Учете, експериментирайте и не се страхувайте да грешите –  
+            така се раждат истинските знания 🙂
+        </p>
+    </section>
 
-    <div class="card">
-        <h2>👋 Въведение: CRUD Магията</h2>
-        <p>Днес вие сте администратори на базата данни на <strong>SoftUni</strong>. Вашата задача е да управлявате информацията за служителите и отделите.</p>
-        <p>Ще използваме четири основни магии (операции):</p>
-        <ul>
-            <li><strong>Create (INSERT):</strong> Създаване на нови записи.</li>
-            <li><strong>Read (SELECT):</strong> Четене на данни.</li>
-            <li><strong>Update (UPDATE):</strong> Промяна на съществуващи данни.</li>
-            <li><strong>Delete (DELETE):</strong> Изтриване на данни.</li>
-        </ul>
-    </div>
-
-    <div class="card" id="card-insert">
-        <h2>1. Наемане на служители (INSERT)</h2>
-        <p>Трябва да добавим нов програмист в системата.</p>
-        
-        <div class="task-box">
-            <strong>Задача:</strong> Напишете SQL заявка, за да добавите следния служител в таблица <code>employees</code>със следните колони: <code>first_name, last_name, job_title, department, salary</code>:<br>
-            <em>Ivan Ivanov, .NET Developer, Software Development, заплата 3500.00</em>
+    <section class="lessons">
+        <div class="lesson-card">
+            <h3>📘 Въведение в базите данни</h3>
+            <a href="index.html">Отвори урока</a>
         </div>
 
-        <textarea id="input-insert" class="editor-area" placeholder="Напишете вашия SQL код тук...&#10;Пример: INSERT INTO employees ..."></textarea>
-        <div class="hint">💡 Подсказка: Използвайте INSERT INTO ... VALUES (...)</div>
-        
-        <button class="btn" onclick="checkInsert()">▶ Изпълни заявката</button>
-        <div id="result-insert" class="result-console"></div>
-    </div>
-
-    <div class="card" id="card-select">
-        <h2>2. Доклад за шефа (SELECT)</h2>
-        <p>Шефът иска списък със служителите, но само определена информация.</p>
-        
-        <div class="task-box">
-            <strong>Задача:</strong> Изберете <strong>само</strong> колоните <code>first_name</code>, <code>last_name</code>, <code>job_title</code> и <code>salary</code> от таблица <code>employees</code>.
+        <div class="lesson-card">
+            <h3>🗂️ Таблици и полета</h3>
+            <a href="index.html">Отвори урока</a>
         </div>
 
-        <textarea id="input-select" class="editor-area" placeholder="SELECT ... FROM ..."></textarea>
-        
-        <button class="btn" onclick="checkSelect()">▶ Изпълни заявката</button>
-        <div id="result-select" class="result-console"></div>
-    </div>
-
-    <div class="card" id="card-update">
-        <h2>3. Увеличение на заплатите (UPDATE)</h2>
-        <p>Фирмата има добра година! Време е да актуализираме заплатите.</p>
-        
-        <div class="task-box">
-            <strong>Задача:</strong> Увеличете заплатата (<code>salary</code>) на <strong>всички</strong> служители с 10%.
+        <div class="lesson-card">
+            <h3>🔑 Първични и външни ключове</h3>
+            <a href="index.html">Отвори урока</a>
         </div>
 
-        <textarea id="input-update" class="editor-area" placeholder="UPDATE employees SET ..."></textarea>
-        <div class="hint">💡 Подсказка: Новата заплата е старата * 1.1</div>
-        
-        <button class="btn" onclick="checkUpdate()">▶ Изпълни заявката</button>
-        <div id="result-update" class="result-console"></div>
-    </div>
-
-    <div class="card" id="card-delete">
-        <h2>4. Почистване на базата (DELETE)</h2>
-        <p>Сезонът в хотела приключи. Мениджърът иска да изтрием записите за заетост.</p>
-        
-        <div class="task-box">
-            <strong>Задача:</strong> Изтрийте всички записи от таблица <code>occupancies</code>.
+        <div class="lesson-card">
+            <h3>💾 SQL – основни заявки</h3>
+            <a href="index.html">Отвори урока</a>
         </div>
-
-        <textarea id="input-delete" class="editor-area" placeholder="DELETE FROM ..."></textarea>
-        <div class="hint">💡 Внимание: Тази операция е необратима!</div>
-        
-        <button class="btn btn-delete" onclick="checkDelete()">🗑️ ИЗТРИЙ ЗАПИСИТЕ</button>
-        <div id="result-delete" class="result-console"></div>
-    </div>
-
-</div>
+		 <div class="lesson-card">
+            <h3>📊 Сортиране и филтриране</h3>
+            <a href="sort_filter_lesson.html">Отвори урока</a>
+        </div>
+		 <div class="lesson-card">
+            <h3>🧠 Подзаявки</h3>
+            <a href="index.html">Отвори урока</a>
+        </div>
+		 <div class="lesson-card">
+            <h3>🔗 Връзки между таблици </h3>
+            <a href="index.html">Отвори урока</a>
+        </div>
+    </section>
+</main>
 
 <footer>
-    <p>Национална програма "Обучение за ИТ кариера" - МОН. Лиценз: CC-BY-NC-SA</p>
-    <p>Съдържанието е изготвено от инж. Полина Кирилова, базирано на материали от Софтуерен Университет.</p>
+    Създадено с <span>❤</span> от <strong>инж. Полина Кирилова</strong><br>
+    Интерактивни уроци по Бази данни – 11 клас
 </footer>
-
-<script>
-    // Помощна функция за нормализиране на текста (премахва нови редове и излишни интервали)
-    function normalize(text) {
-        return text.toLowerCase().replace(/\s+/g, ' ').trim();
-    }
-
-    function showResult(elementId, success, message) {
-        const consoleDiv = document.getElementById(elementId);
-        consoleDiv.style.display = 'block';
-        consoleDiv.style.color = success ? '#2ecc71' : '#e74c3c';
-        consoleDiv.innerHTML = (success ? '✔ УСПЕХ: ' : '❌ ГРЕШКА: ') + message;
-        
-        // Анимация на картата
-        const card = consoleDiv.parentElement;
-        if(success) {
-            card.style.borderLeftColor = '#2ecc71';
-        } else {
-            card.style.borderLeftColor = '#e74c3c';
-        }
-    }
-
-    function checkInsert() {
-        const input = normalize(document.getElementById('input-insert').value);
-        // Проверка за ключови думи от source: 6
-        if (input.includes('insert into employees') && input.includes('values') && input.includes('Ivan', 'Ivanov', '.NET Developer', 'Software Development', 3500.00) && input.includes(';')) {
-            showResult('result-insert', true, 'Успешно добавихте Ivan Ivanov в базата данни! (Query OK, 1 row affected)');
-        } else {
-            showResult('result-insert', false, 'Синтаксисът не е верен или липсват данни. Проверете дали използвате INSERT INTO и правилните имена.');
-        }
-    }
-
-    function checkSelect() {
-        const input = normalize(document.getElementById('input-select').value);
-        // Проверка за ключови думи от source: 16
-        if (input.includes('select') && input.includes('first_name') && input.includes('salary') && input.includes('from employees')) {
-            showResult('result-select', true, 'Заявката върна резултат! Виждате имената и заплатите на служителите.');
-        } else {
-            showResult('result-select', false, 'Уверете се, че сте избрали точните колони (first_name, last_name, job_title, salary) от employees.');
-        }
-    }
-
-    function checkUpdate() {
-        const input = normalize(document.getElementById('input-update').value);
-        // Проверка за ключови думи от source: 19
-        // Търсим умножение по 1.1 или 1.10 или събиране с 10%
-        if (input.includes('update employees') && input.includes('set salary') && (input.includes('* 1.1') || input.includes('*1.1'))) {
-            showResult('result-update', true, 'Заплатите са актуализирани! Служителите са доволни. (Rows matched: 5, Changed: 5)');
-        } else if (input.includes('where')) {
-             showResult('result-update', false, 'В задачата се иска промяна на ВСИЧКИ служители. Не използвайте WHERE тук.');
-        } else {
-            showResult('result-update', false, 'Грешка в логиката. Използвайте: UPDATE table SET column = column * 1.1');
-        }
-    }
-
-    function checkDelete() {
-        const input = normalize(document.getElementById('input-delete').value);
-        // Проверка за ключови думи от source: 27
-        if ((input.includes('delete from occupancies') || input.includes('truncate table occupancies')) && !input.includes('where')) {
-            showResult('result-delete', true, 'Таблицата occupancies беше успешно изчистена. Всички данни са изтрити!');
-        } else if (input.includes('where')) {
-            showResult('result-delete', false, 'Задачата е да изтриете ВСИЧКИ записи, WHERE не е необходим.');
-        } else {
-            showResult('result-delete', false, 'Опитайте с DELETE FROM occupancies');
-        }
-    }
-</script>
 
 </body>
 </html>
