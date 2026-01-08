@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Урок: Тригери (Triggers)</title>
+    <style>
+        :root {
+            --primary-color: #8e44ad; /* Лилаво за по-магически/автоматичен ефект */
+            --accent-color: #9b59b6;
+            --section-bg: #ffffff;
+            --code-bg: #282c34;
+            --text-color: #333;
+            --light-bg: #f4f6f7;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: #f0f3f4;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            background: var(--section-bg);
+            margin-bottom: 2rem;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--accent-color);
+        }
+
+        h2 { color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        h3 { color: #d35400; margin-top: 1.5rem; }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+            border: 1px solid #3e4451;
+        }
+
+        .sql-kw { color: #c678dd; font-weight: bold; } /* Keywords */
+        .sql-var { color: #e06c75; font-weight: bold; } /* Variables NEW/OLD */
+        .sql-str { color: #98c379; } /* Strings */
+
+        /* Interactive Elements */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .step {
+            background: white;
+            padding: 10px 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .arrow { font-size: 1.5rem; color: #7f8c8d; }
+
+        /* Quiz Styles */
+        .mini-quiz {
+            background-color: #fff3e0;
+            border: 1px solid #ffe0b2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .quiz-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            background: white;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .quiz-btn:hover { background-color: #eee; }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            font-weight: bold;
+        }
+        .correct { background-color: #d4edda; color: #155724; display: block; }
+        .wrong { background-color: #f8d7da; color: #721c24; display: block; }
+
+        /* Toggle Answer */
+        .reveal-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .answer-box {
+            display: none;
+            margin-top: 15px;
+            border-top: 1px dashed #ccc;
+            padding-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Бази Данни: Тригери (Triggers)</h1>
+    <p>Автоматизация на процесите и запазване на цялостта на данните</p>
+</header>
+
+<div class="container">
+
+    <section>
+        <h2>1. Какво е Тригер?</h2>
+        <p>Тригерът е специален вид съхранена процедура, която се <strong>стартира автоматично</strong> (задейства се), когато се случи определено събитие в базата данни.</p>
+        <p>Не можете да извикате тригер ръчно. Той чака "в засада" някой да промени данните.</p>
+
+        <div class="flow-diagram">
+            <div class="step">INSERT / UPDATE / DELETE</div>
+            <div class="arrow">➔</div>
+            <div class="step" style="background: #fadbd8; border-color: #e74c3c;">ТРИГЕР</div>
+            <div class="arrow">➔</div>
+            <div class="step">Изпълнение на логика</div>
+        </div>
+
+        <h3>Основни компоненти:</h3>
+        <ul>
+            <li><strong>Време (Timing):</strong> <code>BEFORE</code> (преди записа) или <code>AFTER</code> (след записа).</li>
+            <li><strong>Събитие (Event):</strong> <code>INSERT</code>, <code>UPDATE</code> или <code>DELETE</code>.</li>
+            <li><strong>Таблица:</strong> Тригерът винаги е "закачен" за конкретна таблица.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>2. Магията на NEW и OLD</h2>
+        <p>Вътре в тригера имаме достъп до виртуални променливи, които съдържат данните от реда, който обработваме.</p>
+        
+        <table style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="background: var(--light-bg); text-align: left;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Променлива</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Описание</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Налична при</th>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><code class="sql-var">NEW.column_name</code></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Новата стойност, която се опитваме да запишем.</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">INSERT, UPDATE</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><code class="sql-var">OLD.column_name</code></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Старата стойност, която е била в базата преди промяната.</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">UPDATE, DELETE</td>
+            </tr>
+        </table>
+
+        <div class="mini-quiz" id="quiz1">
+            <h4>🤔 Въпрос:</h4>
+            <p>Искате да направите лог (архив) на старата заплата на служител, преди тя да бъде променена. Коя променлива ще използвате, за да вземете текущата (стара) заплата?</p>
+            <button class="quiz-btn" onclick="checkAnswer('quiz1', 'new')">NEW.salary</button>
+            <button class="quiz-btn" onclick="checkAnswer('quiz1', 'old')">OLD.salary</button>
+            <button class="quiz-btn" onclick="checkAnswer('quiz1', 'none')">CURRENT.salary</button>
+            <div class="feedback"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. Пример: Валидация на данни (BEFORE)</h2>
+        <p>Използваме <code>BEFORE</code>, когато искаме да проверим данните <strong>преди</strong> те да влязат в базата. Ако не ни харесват, можем да ги променим или да спрем заявката.</p>
+        
+        <p><strong>Задача:</strong> Не позволявай заплатата да бъде отрицателно число. Ако някой въведе -500, направи го 0.</p>
+
+        <pre><code><span class="sql-kw">CREATE TRIGGER</span> check_salary_positive
+<span class="sql-kw">BEFORE INSERT ON</span> employees
+<span class="sql-kw">FOR EACH ROW</span>
+<span class="sql-kw">BEGIN</span>
+    <span class="sql-kw">IF</span> <span class="sql-var">NEW.salary</span> < 0 <span class="sql-kw">THEN</span>
+        <span class="sql-kw">SET</span> <span class="sql-var">NEW.salary</span> = 0;
+    <span class="sql-kw">END IF</span>;
+<span class="sql-kw">END</span>;</code></pre>
+
+        <div class="mini-quiz" id="quiz2">
+            <h4>🤔 Логика:</h4>
+            <p>Защо използваме <code>BEFORE</code> в този случай, а не <code>AFTER</code>?</p>
+            <button class="quiz-btn" onclick="checkAnswer('quiz2', 'after')">Няма значение, и двете работят.</button>
+            <button class="quiz-btn" onclick="checkAnswer('quiz2', 'before')">Защото след (AFTER) записа, данните вече са в таблицата и е късно да ги променяме.</button>
+            <div class="feedback"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>4. Пример: История на промените (AFTER)</h2>
+        <p>Най-честата употреба на тригери е за <strong>Audit Logs</strong>. Когато някой изтрие или промени нещо, ние записваме "кой, какво и кога" в друга таблица.</p>
+
+        <p><strong>Задача:</strong> Когато се изтрие служител, запиши името му в таблица <code>deleted_employees_log</code>.</p>
+
+        <pre><code><span class="sql-kw">CREATE TRIGGER</span> log_employee_deletion
+<span class="sql-kw">AFTER DELETE ON</span> employees
+<span class="sql-kw">FOR EACH ROW</span>
+<span class="sql-kw">BEGIN</span>
+    <span class="sql-kw">INSERT INTO</span> deleted_employees_log (emp_name, date_deleted)
+    <span class="sql-kw">VALUES</span> (<span class="sql-var">OLD.first_name</span>, NOW());
+<span class="sql-kw">END</span>;</code></pre>
+    </section>
+
+    <section>
+        <h2>5. Задачи за упражнение</h2>
+        
+        <div style="margin-bottom: 30px;">
+            <h3>Задача 1: Защита на данните</h3>
+            <p>Напишете тригер, който се задейства при обновяване (UPDATE) на таблицата <code>products</code>. Тригерът трябва да проверява дали новата цена (price) е по-висока от старата с повече от 100%. Ако е така, задайте новата цена да бъде старата цена + 10% (автоматична корекция).</p>
+            <button class="reveal-btn" onclick="toggleAnswer('ans1')">Виж Решение</button>
+            <div id="ans1" class="answer-box">
+                <pre><code><span class="sql-kw">CREATE TRIGGER</span> prevent_price_hike
+<span class="sql-kw">BEFORE UPDATE ON</span> products
+<span class="sql-kw">FOR EACH ROW</span>
+<span class="sql-kw">BEGIN</span>
+    <span class="sql-kw">IF</span> <span class="sql-var">NEW.price</span> > <span class="sql-var">OLD.price</span> * 2 <span class="sql-kw">THEN</span>
+        <span class="sql-kw">SET</span> <span class="sql-var">NEW.price</span> = <span class="sql-var">OLD.price</span> * 1.10;
+    <span class="sql-kw">END IF</span>;
+<span class="sql-kw">END</span>;</code></pre>
+            </div>
+        </div>
+
+        <div>
+            <h3>Задача 2: Автоматично попълване</h3>
+            <p>Имате таблица <code>tasks</code> с колона <code>completed_at</code> (дата на завършване). Напишете тригер, който: при <code>UPDATE</code> на статус <code>status = 'DONE'</code>, автоматично записва текущото време (NOW()) в колоната <code>completed_at</code>.</p>
+            <button class="reveal-btn" onclick="toggleAnswer('ans2')">Виж Решение</button>
+            <div id="ans2" class="answer-box">
+                <pre><code><span class="sql-kw">CREATE TRIGGER</span> set_completion_date
+<span class="sql-kw">BEFORE UPDATE ON</span> tasks
+<span class="sql-kw">FOR EACH ROW</span>
+<span class="sql-kw">BEGIN</span>
+    <span class="sql-kw">IF</span> <span class="sql-var">NEW.status</span> = 'DONE' <span class="sql-kw">AND</span> <span class="sql-var">OLD.status</span> != 'DONE' <span class="sql-kw">THEN</span>
+        <span class="sql-kw">SET</span> <span class="sql-var">NEW.completed_at</span> = NOW();
+    <span class="sql-kw">END IF</span>;
+<span class="sql-kw">END</span>;</code></pre>
+            </div>
+        </div>
+
+    </section>
+<section style="border-left-color: #e74c3c; background: #fffcfc;">
+        <h2 style="color: #c0392b;">6. Workshop: Задачи за шампиони</h2>
+        <p>Тези задачи изискват да комбинирате логика и синтаксис. За всяка задача има предоставена структура на таблиците.</p>
+
+        <div class="mini-quiz" style="background: white; border: 1px solid #eee;">
+            <h4 style="color: #c0392b;">Задача 3: Банкова сигурност (STOP Transaction)</h4>
+            <p><strong>Сценарий:</strong> Работите по банков софтуер. Имате таблица <code>accounts</code> с колони <code>id</code>, <code>owner</code> и <code>balance</code>.</p>
+            <p><strong>Цел:</strong> Напишете тригер, който <strong>не позволява</strong> теглене на пари, ако балансът стане отрицателен. Ако след транзакцията балансът е под 0, тригерът трябва да върне баланса към старата му стойност (да отмени промяната).</p>
+            
+            <div style="background: #f4f6f7; padding: 10px; margin: 10px 0; font-size: 0.9em;">
+                <em>Таблица: accounts (id, owner, balance)</em>
+            </div>
+
+           
+        </div>
+
+        <div class="mini-quiz" style="background: white; border: 1px solid #eee;">
+            <h4 style="color: #2980b9;">Задача 4: История на цените (Audit Log)</h4>
+            <p><strong>Сценарий:</strong> В онлайн магазин искаме да следим как се променят цените на стоките във времето.</p>
+            <p><strong>Цел:</strong> Създайте тригер, който при всяка промяна на цената в таблица <code>products</code>, записва старата цена, новата цена и датата на промяна в таблица <code>price_history</code>.</p>
+            
+            <div style="background: #f4f6f7; padding: 10px; margin: 10px 0; font-size: 0.9em;">
+                <em>Таблици: <br>
+                1. products (id, name, price)<br>
+                2. price_history (id, product_id, old_price, new_price, changed_at)</em>
+            </div>
+
+           
+        </div>
+
+        <div class="mini-quiz" style="background: white; border: 1px solid #eee;">
+            <h4 style="color: #8e44ad;">Задача 5: Неизтриваемият запис (Protection)</h4>
+            <p><strong>Сценарий:</strong> В таблицата със служители има запис с позиция 'CEO' (Изпълнителен директор).</p>
+            <p><strong>Цел:</strong> Напишете тригер, който предотвратява изтриването (DELETE) на служител, ако неговата длъжност (position) е 'CEO'. Ако някой се опита да го изтрие, тригерът трябва да хвърли грешка (или да използваме "трик" за MySQL, ако не ползваме SIGNAL - например да променим ID-то на невалидно, но тук ще ползваме SIGNAL SQLSTATE за пълнота).</p>
+            
+            <div style="background: #f4f6f7; padding: 10px; margin: 10px 0; font-size: 0.9em;">
+                <em>Таблица: employees (id, name, position)</em>
+            </div>
+
+            
+        </div>
+
+    </section>
+</div>
+
+<script>
+    function checkAnswer(quizId, answer) {
+        const feedbackEl = document.querySelector(`#${quizId} .feedback`);
+        
+        if (quizId === 'quiz1') {
+            if (answer === 'old') {
+                feedbackEl.innerHTML = "✅ Браво! OLD.salary пази стойността, която е в базата ПРЕДИ редакцията.";
+                feedbackEl.className = "feedback correct";
+            } else if (answer === 'new') {
+                feedbackEl.innerHTML = "❌ Не. NEW.salary е новата стойност, която потребителят се опитва да запише.";
+                feedbackEl.className = "feedback wrong";
+            } else {
+                feedbackEl.innerHTML = "❌ Грешно. Такава променлива няма.";
+                feedbackEl.className = "feedback wrong";
+            }
+        }
+
+        if (quizId === 'quiz2') {
+            if (answer === 'before') {
+                feedbackEl.innerHTML = "✅ Точно така! За да модифицираме данните, трябва да ги 'хванем' преди (BEFORE) да бъдат записани на диска.";
+                feedbackEl.className = "feedback correct";
+            } else {
+                feedbackEl.innerHTML = "❌ Грешно. При AFTER данните вече са записани. Можем да правим други неща (логване), но не и да променяме текущия ред.";
+                feedbackEl.className = "feedback wrong";
+            }
+        }
+    }
+
+    function toggleAnswer(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === 'block') {
+            el.style.display = 'none';
+        } else {
+            el.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
