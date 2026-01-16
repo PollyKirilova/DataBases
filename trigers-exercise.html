@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Advanced: Тригери и Транзакции</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-purple: #bb86fc;
+            --accent-teal: #03dac6;
+            --accent-error: #cf6679;
+            --code-bg: #2d2d2d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #3700b3, #6200ea);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-teal);
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; color: #fff; }
+        .subtitle { font-style: italic; opacity: 0.8; color: var(--accent-teal); }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section-title {
+            color: var(--accent-purple);
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-top: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--accent-purple);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        .task-box {
+            background-color: rgba(187, 134, 252, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px dashed var(--accent-purple);
+        }
+
+        .editor-area {
+            width: 100%;
+            height: 120px;
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        .editor-area:focus { border-color: var(--accent-teal); }
+
+        .btn {
+            background-color: var(--accent-purple);
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        .btn:hover { background-color: #9955e8; }
+        
+        .result-console {
+            background-color: #000;
+            font-family: monospace;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: none;
+            border: 1px solid #333;
+            white-space: pre-wrap;
+        }
+
+        code { color: var(--accent-teal); background: #333; padding: 2px 5px; border-radius: 3px; }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .tag-trigger { background-color: #3700b3; color: white; }
+        .tag-transaction { background-color: #018786; color: white; }
+
+        footer { text-align: center; padding: 30px; color: #666; font-size: 0.8rem; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚙️ SQL Master: Advanced</h1>
+    <p class="subtitle">Упражнения с базата на W3Schools: Customers, Products, Orders</p>
+</header>
+
+<div class="container">
+
+    <h2 class="section-title">I. Тригери (Автоматизация)</h2>
+    <p>Тригерите са код, който се изпълнява автоматично при INSERT, UPDATE или DELETE.</p>
+
+    <div class="card">
+        <span class="tag tag-trigger">TRIGGER 1</span>
+        <h3>👮‍♂️ Валидация на цени</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> Не позволявайте в таблица <code>Products</code> да се въвеждат продукти с отрицателна цена.
+            <br>Създайте тригер <code>check_price</code> (BEFORE INSERT), който проверява дали <code>NEW.Price < 0</code>. Ако е така, направете цената 0.
+        </div>
+        <textarea id="t1" class="editor-area" placeholder="CREATE TRIGGER check_price BEFORE INSERT ON Products..."></textarea>
+        <button class="btn" onclick="checkTrigger(1)">Провери</button>
+        <div id="r-t1" class="result-console"></div>
+    </div>
+
+    <div class="card">
+        <span class="tag tag-trigger">TRIGGER 2</span>
+        <h3>📝 Лог на изтрити клиенти</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> Когато изтрием клиент от <code>Customers</code>, искаме да запазим името му в таблица <code>DeletedUsers</code>.
+            <br>Създайте тригер (AFTER DELETE), който записва <code>OLD.CustomerName</code> и текущата дата <code>NOW()</code>.
+        </div>
+        <textarea id="t2" class="editor-area" placeholder="CREATE TRIGGER log_delete AFTER DELETE ON Customers..."></textarea>
+        <button class="btn" onclick="checkTrigger(2)">Провери</button>
+        <div id="r-t2" class="result-console"></div>
+    </div>
+
+    <div class="card">
+        <span class="tag tag-trigger">TRIGGER 3</span>
+        <h3>🔠 Автоматичен главни букви</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> Искаме кодовете на държавите винаги да са с главни букви.
+            <br>При INSERT в <code>Customers</code>, променете <code>NEW.Country</code> да бъде равно на <code>UPPER(NEW.Country)</code>.
+        </div>
+        <textarea id="t3" class="editor-area" placeholder="CREATE TRIGGER uppercase_country BEFORE INSERT..."></textarea>
+        <button class="btn" onclick="checkTrigger(3)">Провери</button>
+        <div id="r-t3" class="result-console"></div>
+    </div>
+
+    <div class="card">
+        <span class="tag tag-trigger">TRIGGER 4</span>
+        <h3>🛑 Защита на склад</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> (Симулация) Представете си, че има колона <code>Stock</code> в Products.
+            <br>Не позволявайте продажба (UPDATE), ако наличността стане под 0. Ако <code>NEW.Stock < 0</code>, върнете грешка (SIGNAL SQLSTATE...).
+        </div>
+        <textarea id="t4" class="editor-area" placeholder="... IF NEW.Stock < 0 THEN SIGNAL SQLSTATE ..."></textarea>
+        <button class="btn" onclick="checkTrigger(4)">Провери</button>
+        <div id="r-t4" class="result-console"></div>
+    </div>
+
+    <div class="card">
+        <span class="tag tag-trigger">TRIGGER 5</span>
+        <h3>🔄 Синхронизация</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> При промяна на цената на продукт (UPDATE) в <code>Products</code>, запишете старата цена в таблица <code>PriceHistory</code>.
+            <br>Използвайте <code>OLD.Price</code> и <code>NEW.Price</code>.
+        </div>
+        <textarea id="t5" class="editor-area" placeholder="CREATE TRIGGER price_history AFTER UPDATE..."></textarea>
+        <button class="btn" onclick="checkTrigger(5)">Провери</button>
+        <div id="r-t5" class="result-console"></div>
+    </div>
+
+
+    <h2 class="section-title">II. Транзакции (Всичко или нищо)</h2>
+    <p>Транзакциите групират заявки. Използвайте <code>START TRANSACTION</code> (или BEGIN), <code>COMMIT</code> (запис) и <code>ROLLBACK</code> (отказ).</p>
+
+    <div class="card">
+        <span class="tag tag-transaction">TRANSACTION 1</span>
+        <h3>📦 Създаване на поръчка (Atomic)</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> Трябва да създадем поръчка и детайли за нея едновременно.
+            <br>1. Започнете транзакция.<br>2. Вкарайте запис в <code>Orders</code>.<br>3. Вкарайте запис в <code>OrderDetails</code>.<br>4. Потвърдете (COMMIT).
+        </div>
+        <textarea id="tx1" class="editor-area" placeholder="START TRANSACTION;&#10;INSERT INTO Orders...;&#10;INSERT INTO OrderDetails...;&#10;COMMIT;"></textarea>
+        <button class="btn" onclick="checkTx(1)">Провери</button>
+        <div id="r-tx1" class="result-console"></div>
+    </div>
+
+    <div class="card">
+        <span class="tag tag-transaction">TRANSACTION 2</span>
+        <h3>🔙 Грешка и връщане (Rollback)</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> Опитахте да изтриете грешен клиент.
+            <br>1. Започнете транзакция.<br>2. Изтрийте всички клиенти от 'Mexico' (DELETE FROM Customers...).<br>3. Осъзнахте грешката си! Върнете назад (ROLLBACK).
+        </div>
+        <textarea id="tx2" class="editor-area" placeholder="BEGIN;&#10;DELETE FROM...&#10;ROLLBACK;"></textarea>
+        <button class="btn" onclick="checkTx(2)">Провери</button>
+        <div id="r-tx2" class="result-console"></div>
+    </div>
+
+    <div class="card">
+        <span class="tag tag-transaction">TRANSACTION 3</span>
+        <h3>🏷️ Масова промяна на цени</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> Шефът иска да увеличи цените, но само ако сме сигурни.
+            <br>Напишете транзакция, която увеличава цените в <code>Products</code> с 10% и веднага след това потвърждава промените.
+        </div>
+        <textarea id="tx3" class="editor-area" placeholder="START TRANSACTION;&#10;UPDATE Products...&#10;COMMIT;"></textarea>
+        <button class="btn" onclick="checkTx(3)">Провери</button>
+        <div id="r-tx3" class="result-console"></div>
+    </div>
+
+    <div class="card">
+        <span class="tag tag-transaction">TRANSACTION 4</span>
+        <h3>⚠️ Трансфер на категория (Сложна логика)</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> Трябва да преместим продуктите от Категория 1 в Категория 2 и да изтрием Категория 1.
+            <br>Изпълнете 3 стъпки в една транзакция: UPDATE продуктите, DELETE категорията, COMMIT.
+        </div>
+        <textarea id="tx4" class="editor-area" placeholder="START TRANSACTION;&#10;UPDATE Products SET CategoryID=2...&#10;DELETE FROM Categories...&#10;COMMIT;"></textarea>
+        <button class="btn" onclick="checkTx(4)">Провери</button>
+        <div id="r-tx4" class="result-console"></div>
+    </div>
+
+    <div class="card">
+        <span class="tag tag-transaction">TRANSACTION 5</span>
+        <h3>⚓ Savepoint (Контролна точка)</h3>
+        <div class="task-box">
+            <strong>Задача:</strong> За напреднали: Направете промяна, сложете SAVEPOINT, направете грешка, върнете се само до SAVEPOINT.
+            <br>Структура: BEGIN -> UPDATE -> SAVEPOINT SP1 -> DELETE (грешка) -> ROLLBACK TO SP1 -> COMMIT.
+        </div>
+        <textarea id="tx5" class="editor-area" placeholder="BEGIN;&#10;UPDATE...&#10;SAVEPOINT SP1;&#10;DELETE...&#10;ROLLBACK TO SP1;&#10;COMMIT;"></textarea>
+        <button class="btn" onclick="checkTx(5)">Провери</button>
+        <div id="r-tx5" class="result-console"></div>
+    </div>
+
+</div>
+
+<footer>
+    <p>SoftUni Training Simulation | Generated for 11. Grade</p>
+</footer>
+
+<script>
+    function normalize(text) {
+        return text.toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function showResult(elementId, success, msg) {
+        const el = document.getElementById(elementId);
+        el.style.display = 'block';
+        el.style.color = success ? '#03dac6' : '#cf6679';
+        el.innerText = (success ? '✔ УСПЕХ: ' : '❌ ГРЕШКА: ') + msg;
+    }
+
+    // --- ПРОВЕРКА ТРИГЕРИ ---
+    function checkTrigger(id) {
+        const val = normalize(document.getElementById('t' + id).value);
+        let success = false, msg = "";
+
+        if (id === 1) { // Check Price
+            if (val.includes('before insert') && val.includes('products') && val.includes('new.price < 0')) {
+                success = true; msg = "Тригерът е валиден! Отрицателните цени ще бъдат коригирани.";
+            } else msg = "Трябва да е BEFORE INSERT ON Products и да проверява NEW.Price.";
+        }
+        else if (id === 2) { // Log Delete
+            if (val.includes('after delete') && val.includes('customers') && val.includes('old.customername')) {
+                success = true; msg = "Логването работи. Изтритите клиенти се записват.";
+            } else msg = "Използвайте AFTER DELETE и вземете името чрез OLD.CustomerName.";
+        }
+        else if (id === 3) { // Uppercase
+            if (val.includes('before insert') && val.includes('upper(new.country)')) {
+                success = true; msg = "Държавите ще се записват с главни букви.";
+            } else msg = "Липсва функцията UPPER() или моментът не е BEFORE INSERT.";
+        }
+        else if (id === 4) { // Stock Protection
+            if ((val.includes('signal') || val.includes('error')) && val.includes('new.stock < 0')) {
+                success = true; msg = "Защитата е активна. Не може да продавате под 0.";
+            } else msg = "Трябва да проверите NEW.Stock и да хвърлите грешка (SIGNAL/ERROR).";
+        }
+        else if (id === 5) { // Price History
+            if (val.includes('after update') && val.includes('old.price') && val.includes('new.price')) {
+                success = true; msg = "Историята на цените се пази успешно.";
+            } else msg = "При промяна (UPDATE) трябва да достъпите старата (OLD) и новата (NEW) цена.";
+        }
+        showResult('r-t' + id, success, msg);
+    }
+
+    // --- ПРОВЕРКА ТРАНЗАКЦИИ ---
+    function checkTx(id) {
+        const val = normalize(document.getElementById('tx' + id).value);
+        let success = false, msg = "";
+        
+        const hasStart = val.includes('start transaction') || val.includes('begin');
+        const hasCommit = val.includes('commit');
+        const hasRollback = val.includes('rollback');
+
+        if (id === 1) { // Create Order
+            if (hasStart && hasCommit && val.includes('insert into orders') && val.includes('insert into orderdetails')) {
+                success = true; msg = "Транзакцията е успешна! Поръчката е създадена цялостно.";
+            } else msg = "Трябва да има BEGIN, два INSERT-а и накрая COMMIT.";
+        }
+        else if (id === 2) { // Rollback Delete
+            if (hasStart && hasRollback && val.includes('delete from customers')) {
+                success = true; msg = "Спасихте данните! Rollback върна изтритите клиенти.";
+            } else msg = "Задължително завършете с ROLLBACK, за да отмените изтриването.";
+        }
+        else if (id === 3) { // Mass Update
+            if (hasStart && hasCommit && val.includes('update products')) {
+                success = true; msg = "Цените са обновени безопасно.";
+            } else msg = "Групирайте UPDATE заявката между START TRANSACTION и COMMIT.";
+        }
+        else if (id === 4) { // Move Category
+            if (hasStart && hasCommit && val.includes('update products') && val.includes('delete from categories')) {
+                success = true; msg = "Категорията е преместена и старата е изтрита успешно.";
+            } else msg = "Трябва да имате един UPDATE, един DELETE и COMMIT накрая.";
+        }
+        else if (id === 5) { // Savepoint
+            if (hasStart && hasCommit && val.includes('savepoint') && val.includes('rollback to')) {
+                success = true; msg = "Отлично използване на Savepoint!";
+            } else msg = "Липсва SAVEPOINT или ROLLBACK TO [ime].";
+        }
+
+        showResult('r-tx' + id, success, msg);
+    }
+</script>
+
+</body>
+</html>
