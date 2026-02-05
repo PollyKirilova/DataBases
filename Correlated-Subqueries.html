@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Урок: Взаимосвързани заявки</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f4f7f6;
+            --text: #333;
+            --white: #ffffff;
+            --code-bg: #282c34;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: var(--primary);
+            color: var(--white);
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        section {
+            background: var(--white);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--accent);
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 10px;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            color: #abb2bf;
+            padding: 1.5rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            position: relative;
+        }
+
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .table { color: #e06c75; }
+        .alias { color: #d19a66; }
+
+        .step-box {
+            border-left: 4px solid var(--accent);
+            background: #eef7ff;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .quiz-option {
+            display: block;
+            background: var(--bg);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .quiz-option:hover {
+            background: #dbeaf5;
+        }
+
+        .hidden-answer {
+            display: none;
+            color: #27ae60;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Взаимосвързани подзаявки (Correlated Subqueries)</h1>
+    <p>Интерактивен урок по Бази Данни</p>
+</header>
+
+<div class="container">
+    
+    <section id="intro">
+        <h2>1. Какво представляват?</h2>
+        <p>За разлика от обикновените подзаявки, които се изпълняват само веднъж, <strong>взаимосвързаната подзаявка</strong> се изпълнява по веднъж за всеки ред от външната заявка.</p>
+        <p>Тя използва стойност от външната таблица, за да извърши своите изчисления.</p>
+        
+        
+    </section>
+
+    <section id="syntax">
+        <h2>2. Синтаксис и Структура</h2>
+        <p>За да работи връзката, задължително използваме <strong>псевдоними (aliases)</strong>.</p>
+        <div class="code-block">
+            <span class="keyword">SELECT</span> column1<br>
+            <span class="keyword">FROM</span> table1 <span class="alias">AS t1</span><br>
+            <span class="keyword">WHERE</span> column2 > (<br>
+            &nbsp;&nbsp;<span class="keyword">SELECT</span> <span class="function">AVG</span>(column2)<br>
+            &nbsp;&nbsp;<span class="keyword">FROM</span> table1 <span class="alias">AS t2</span><br>
+            &nbsp;&nbsp;<span class="keyword">WHERE</span> <span class="alias">t2.category</span> = <span class="alias">t1.category</span><br>
+            );
+        </div>
+    </section>
+
+    <section id="example">
+        <h2>3. Пример стъпка по стъпка</h2>
+        <p>Да намерим всички служители, чиято заплата е по-висока от средната за техния отдел:</p>
+        
+        <div class="step-box">
+            <strong>Стъпка 1:</strong> Външната заявка взема първия служител (напр. от отдел 'IT').<br>
+            <strong>Стъпка 2:</strong> Вътрешната заявка получава ID-то на отдела ('IT') и изчислява средната заплата само за него.<br>
+            <strong>Стъпка 3:</strong> Резултатът се връща и се проверява дали заплатата на нашия служител е по-висока.<br>
+            <strong>Стъпка 4:</strong> SQL преминава към следващия служител и повтаря процеса.
+        </div>
+    </section>
+
+    <section id="quiz">
+        <h2>4. Провери знанията си</h2>
+        <p>Кое е вярно за взаимосвързаните подзаявки?</p>
+        <div class="quiz-option" onclick="showAnswer('q1')">A) Изпълняват се само веднъж преди главната заявка.</div>
+        <div class="quiz-option" onclick="showAnswer('q1')">B) Изпълняват се за всеки ред от външната заявка.</div>
+        <div class="quiz-option" onclick="showAnswer('q1')">C) Не могат да използват агрегатни функции.</div>
+        <div id="q1" class="hidden-answer">Правилен отговор: B! Подзаявката "чака" стойност от всеки ред на главната заявка.</div>
+    </section>
+
+</div>
+
+<footer>
+    <p>&copy; 2024 Урок по Бази Данни - Интерактивно обучение</p>
+</footer>
+
+<script>
+    function showAnswer(id) {
+        const element = document.getElementById(id);
+        element.style.display = (element.style.display === 'block') ? 'none' : 'block';
+    }
+</script>
+
+</body>
+</html>
