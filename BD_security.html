@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивен урок: Сигурност и управление на потребители</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --light-bg: #f4f7f6;
+            --text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--light-bg);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .section {
+            background: white;
+            padding: 35px;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--secondary);
+        }
+
+        h2 { color: var(--primary); font-size: 1.8rem; margin-top: 0; }
+        h3 { color: var(--secondary); margin-top: 1.5rem; }
+
+        .theory-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--accent);
+            padding: 15px 20px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .sql-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th { background-color: var(--light-bg); }
+
+        .quiz-container {
+            background: #fff3e0;
+            border: 1px solid #ffe0b2;
+            padding: 25px;
+            margin-top: 30px;
+            border-radius: 10px;
+        }
+
+        .option {
+            display: block;
+            background: white;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option:hover { background: #f0f0f0; }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button:hover { background: var(--secondary); }
+
+        .feedback { margin-top: 15px; font-weight: bold; min-height: 24px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🔐 Сигурност и управление на потребители</h1>
+    <p>Цялостен курс за проектиране на защитени Бази Данни</p>
+</header>
+
+<div class="section">
+    <h2>1. Основи на сигурността и моделът PoLP</h2>
+    <p>Сигурността в една СУБД (Система за управление на бази данни) не се ограничава само до паролата за достъп. Тя включва контрол на всяко действие, което потребителят може да извърши върху данните.</p>
+    
+    <div class="theory-box">
+        <strong>Принцип на минималните привилегии (Principle of Least Privilege - PoLP):</strong> 
+        Всеки субект в системата трябва да има достъп само до информацията и ресурсите, които са му необходими за легитимни цели.
+    </div>
+
+    <h3>Защо е важно?</h3>
+    <ul>
+        <li><strong>Намаляване на "повърхността на атака":</strong> Ако акаунтът на един служител бъде компрометиран, хакерът ще има само ограничените права на този служител.</li>
+        <li><strong>Предотвратяване на грешки:</strong> Потребител без право на <code>DROP</code> не може случайно да изтрие цяла таблица.</li>
+    </ul>
+    o	Предотвратяване на нерегламентиран достъп.
+o	Защита от човешка грешка (случайно изтриване).
+o	Спазване на законови изисквания (GDPR).
+o	Проследяемост на действията.
+
+
+    <div class="quiz-container">
+        <p><strong>❓ Проверка на знанията:</strong> Кое от следните е най-добрият пример за спазване на принципа PoLP?</p>
+        <div class="options">
+            <label class="option"><input type="radio" name="q1" value="a"> Даване на "Administrative" права на всички програмисти, за да работят бързо.</label>
+            <label class="option"><input type="radio" name="q1" value="b"> Даване само на <code>SELECT</code> право на анализатор, който само генерира отчети.</label>
+            <label class="option"><input type="radio" name="q1" value="c"> Използване на една обща парола за целия отдел "Продажби".</label>
+        </div>
+        <button onclick="checkAnswer('q1', 'b', 'Браво! ✅ Това е същността на PoLP - само нужните права.')">Провери отговора</button>
+        <div id="feedback-q1" class="feedback"></div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>2. Типове потребители и роли</h2>
+    <p>В професионалните системи потребителите се разделят на категории според техните отговорности. Вместо да управляваме всеки потребител поотделно, използваме <strong>Роли</strong>.</p>
+    
+    
+
+    <table>
+        <thead>
+            <tr>
+                <th>Тип потребител</th>
+                <th>Основни права</th>
+                <th>Описание</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>DBA (Администратор)</strong></td>
+                <td>ALL PRIVILEGES</td>
+                <td>Управлява цялата система, архиви и потребители.</td>
+            </tr>
+            <tr>
+                <td><strong>Developer</strong></td>
+                <td>CREATE, ALTER, DROP</td>
+                <td>Променя структурата на базата (DDL).</td>
+            </tr>
+            <tr>
+                <td><strong>Operator</strong></td>
+                <td>INSERT, UPDATE, SELECT</td>
+                <td>Ежедневна работа с данни (DML).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="quiz-container">
+        <p><strong>❓ Проверка на знанията:</strong> Какво представлява "Ролята" в контекста на БД?</p>
+        <div class="options">
+            <label class="option"><input type="radio" name="q2" value="a"> Списък с пароли на всички потребители.</label>
+            <label class="option"><input type="radio" name="q2" value="b"> Именувана група от привилегии, която може да се присвоява на потребители.</label>
+            <label class="option"><input type="radio" name="q2" value="c"> Специален скрипт за автоматично триене на данни.</label>
+        </div>
+        <button onclick="checkAnswer('q2', 'b', 'Точно така! ✅ Ролите улесняват масовото управление на права.')">Провери отговора</button>
+        <div id="feedback-q2" class="feedback"></div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>3. Синтаксис за управление: GRANT и REVOKE</h2>
+    <p>Контролът на достъпа в SQL се осъществява чрез подезика <strong>DCL (Data Control Language)</strong>. Ето основните операции:</p>
+
+    <h3>Създаване на потребител</h3>
+    <div class="sql-block">
+        CREATE USER 'accountant'@'localhost' IDENTIFIED BY 'Strong_Pass_2026';
+    </div>
+
+    <h3>Предоставяне на права (GRANT)</h3>
+    <p>Можете да ограничите правата до ниво база, таблица или дори колона.</p>
+    <div class="sql-block">
+        GRANT SELECT, INSERT ON company_db.invoices TO 'accountant'@'localhost';
+    </div>
+
+    <h3>Отнемане на права (REVOKE)</h3>
+    <div class="sql-block">
+        REVOKE INSERT ON company_db.invoices FROM 'accountant'@'localhost';
+    </div>
+
+    <div class="quiz-container">
+        <p><strong>❓ Проверка на знанията:</strong> Кой SQL израз е правилен за даване на права за четене на таблица 'Users' за потребител 'guest'?</p>
+        <div class="options">
+            <label class="option"><input type="radio" name="q3" value="a"> <code>ALLOW SELECT ON Users TO guest;</code></label>
+            <label class="option"><input type="radio" name="q3" value="b"> <code>GRANT SELECT ON Users TO guest;</code></label>
+            <label class="option"><input type="radio" name="q3" value="c"> <code>GIVE READ ON Users TO guest;</code></label>
+        </div>
+        <button onclick="checkAnswer('q3', 'b', 'Вярно! ✅ GRANT е стандартната ключова дума.')">Провери отговора</button>
+        <div id="feedback-q3" class="feedback"></div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>4. Одит и тригери за сигурност</h2>
+    <p>Дори при перфектни права, е важно да имаме история на действията. <strong>Одитът</strong> отговаря на въпроса: <em>"Кой промени цената на този продукт в 3 часа през нощта?"</em></p>
+
+    <h3>Как се реализира одитът?</h3>
+    <ul>
+        <li><strong>Системни логове:</strong> СУБД автоматично записва опитите за влизане (Login logs).</li>
+        <li><strong>Потребителски одит (Тригери):</strong> Програмни обекти, които се задействат при <code>UPDATE</code> или <code>DELETE</code> и копират старите данни в архивна таблица.</li>
+    </ul>
+
+    
+
+    <div class="quiz-container">
+        <p><strong>❓ Проверка на знанията:</strong> Защо е важно администраторите да нямат право да трият одит логовете?</p>
+        <div class="options">
+            <label class="option"><input type="radio" name="q4" value="a"> За да не се запълва диска на сървъра.</label>
+            <label class="option"><input type="radio" name="q4" value="b"> За да се осигури отчетност и да не могат да скрият собствените си действия при злоупотреба.</label>
+            <label class="option"><input type="radio" name="q4" value="c"> Защото логовете са нужни за бързината на заявките.</label>
+        </div>
+        <button onclick="checkAnswer('q4', 'b', 'Правилно! ✅ Това се нарича "неотменимост" (non-repudiation) на действията.')">Провери отговора</button>
+        <div id="feedback-q4" class="feedback"></div>
+    </div>
+</div>
+
+<footer>
+    <p style="text-align: center; margin-top: 50px; color: #7f8c8d;">
+        Изготвено за учебни цели • 2026 • Бази Данни 101
+    </p>
+</footer>
+
+<script>
+    function checkAnswer(name, correct, msg) {
+        const feedback = document.getElementById('feedback-' + name);
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+
+        if (!selected) {
+            feedback.innerHTML = "⚠️ Моля, избери отговор преди проверка!";
+            feedback.style.color = "var(--accent)";
+            return;
+        }
+
+        if (selected.value === correct) {
+            feedback.innerHTML = msg;
+            feedback.style.color = "var(--success)";
+        } else {
+            feedback.innerHTML = "Грешен отговор. Прегледай теорията по-горе и опитай пак! ❌";
+            feedback.style.color = "var(--error)";
+        }
+    }
+</script>
+
+</body>
+</html>
