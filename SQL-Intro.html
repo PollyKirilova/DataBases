@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MySQL: Основи и Заявки - 11. Клас</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary-color: #2c3e50; --accent-color: #3498db; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background-color: var(--primary-color); shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .hero-header { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 4rem 0; margin-bottom: 2rem; }
+        .sql-card { background: #282c34; color: #abb2bf; padding: 1.5rem; border-radius: 8px; font-family: 'Fira Code', monospace; position: relative; margin: 1rem 0; }
+        .keyword { color: #c678dd; font-weight: bold; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .comment { color: #5c6370; font-style: italic; }
+        .section-title { border-left: 5px solid var(--accent-color); padding-left: 15px; margin-top: 3rem; color: var(--primary-color); }
+        .type-badge { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#"><i class="fas fa-database me-2"></i>MySQL Урок</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#intro">Въведение</a></li>
+                <li class="nav-item"><a class="nav-link" href="#types">Типове данни</a></li>
+                <li class="nav-item"><a class="nav-link" href="#ddl">Структура</a></li>
+                <li class="nav-item"><a class="nav-link" href="#select">Заявки</a></li>
+                <li class="nav-item"><a class="nav-link" href="#practice">Упражнение</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="hero-header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Въведение в Релационните Бази Данни</h1>
+        <p class="lead">Пълен курс по MySQL за ученици от 11. клас</p>
+    </div>
+</header>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+
+            <section id="intro">
+                <h2 class="section-title">1. Що е то SQL?</h2>
+                <p class="mt-3"><strong>SQL (Structured Query Language)</strong> е езикът, на който "говорим" с базите данни. Той е декларативен – ние казваме на компютъра <strong>какво</strong> да извлече, а не <strong>как</strong> да го направи.</p>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 p-3 shadow-sm">
+                            <h5><i class="fas fa-columns text-primary me-2"></i>Проекция</h5>
+                            <p>Избор на конкретни <strong>колони</strong> (вертикално отрязване на таблицата).</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 p-3 shadow-sm">
+                            <h5><i class="fas fa-filter text-success me-2"></i>Селекция</h5>
+                            <p>Избор на конкретни <strong>редове</strong> чрез условия (хоризонтално филтриране).</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </section>
+
+            <section id="types">
+                <h2 class="section-title">2. Типове данни в MySQL</h2>
+                <p>В MySQL трябва да изберем правилен тип за всяка колона, за да работи базата ефективно.</p>
+                <div class="table-responsive shadow-sm rounded">
+                    <table class="table table-bordered bg-white mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Категория</th>
+                                <th>Тип</th>
+                                <th>Кога се използва?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold">Числа</td>
+                                <td><code>INT</code>, <code>DECIMAL(p,s)</code></td>
+                                <td>За идентификатори (ID), възраст или цени (напр. 10.50).</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Текст</td>
+                                <td><code>VARCHAR(N)</code>, <code>TEXT</code></td>
+                                <td>За имена, адреси или дълги описания.</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Време</td>
+                                <td><code>DATE</code>, <code>YEAR</code></td>
+                                <td>За рождени дати или година на производство.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+            </section>
+
+            <section id="ddl">
+                <h2 class="section-title">3. Създаване на таблици</h2>
+                <p>Използваме <code>CREATE TABLE</code>, за да дефинираме структурата на нашето училище.</p>
+                <div class="sql-card shadow">
+                    <button class="btn btn-outline-light btn-sm copy-btn">Копирай</button>
+                    <span class="keyword">CREATE TABLE</span> Students (<br>
+                    &nbsp;&nbsp;StudID <span class="keyword">INT PRIMARY KEY</span>,<br>
+                    &nbsp;&nbsp;FirstName <span class="keyword">VARCHAR</span>(50),<br>
+                    &nbsp;&nbsp;LastName <span class="keyword">VARCHAR</span>(50),<br>
+                    &nbsp;&nbsp;Age <span class="keyword">INT</span><br>
+                    );
+                </div>
+            </section>
+
+            <section id="select">
+                <h2 class="section-title">4. Основни заявки (SELECT & WHERE)</h2>
+                <p>След като имаме данни, можем да ги филтрираме и сортираме.</p>
+                
+                <h5 class="mt-4">Филтриране с оператор <code>LIKE</code></h5>
+                <p>Използваме <code>%</code> за заместване на произволен брой знаци.</p>
+                <div class="sql-card">
+                    <span class="comment">-- Намиране на ученици, чието име започва с 'A'</span><br>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Students <br>
+                    <span class="keyword">WHERE</span> FirstName <span class="keyword">LIKE</span> <span class="string">'A%'</span>;
+                </div>
+
+                <h5 class="mt-4">Функции в MySQL</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>CONCAT:</strong> Съединява текст.</p>
+                        <div class="sql-card">
+                            <span class="keyword">SELECT</span> <span class="function">CONCAT</span>(FirstName, <span class="string">' '</span>, LastName) <span class="keyword">FROM</span> Students;
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>MONTHNAME:</strong> Името на месеца.</p>
+                        <div class="sql-card">
+                            <span class="keyword">SELECT</span> <span class="function">MONTHNAME</span>(BirthDate) <span class="keyword">FROM</span> Students;
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="practice" class="mt-5">
+                <div class="card border-primary shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Практическо упражнение</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Отворете <strong>DB-Fiddle</strong> и изпълнете следните задачи върху таблицата <code>Students</code>:</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">1. Изведете имената на всички ученици, сортирани по фамилия (Z към A).</li>
+                            <li class="list-group-item">2. Намерете учениците, които са на възраст между 16 и 18 години.</li>
+                            <li class="list-group-item">3. Създайте поле <code>Email</code>, съединявайки малкото име с домейни "@school.bg".</li>
+                            <li class="list-group-item">4. Изтрийте записите на учениците, чието име е "Тест".</li>
+                        </ul>
+                        <div class="text-center mt-4">
+                            <a href="https://www.db-fiddle.com/" target="_blank" class="btn btn-primary btn-lg">Към DB-Fiddle <i class="fas fa-external-link-alt ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center">
+        <p class="mb-0">Изработено за часовете по Бази Данни - 11. клас</p>
+        <small class="text-muted">Материали: СофтУни Фондация (CC-BY-NC-SA)</small>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
