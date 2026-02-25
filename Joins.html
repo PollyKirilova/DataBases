@@ -41,14 +41,51 @@
         .arrow { font-size: 2em; align-self: center; color: #7f8c8d; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+            <style>
+        :root { --primary-color: #2c3e50; --accent-color: #3498db; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background-color: var(--primary-color); shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .hero-header { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 4rem 0; margin-bottom: 2rem; }
+        .sql-card { background: #282c34; color: #abb2bf; padding: 1.5rem; border-radius: 8px; font-family: 'Fira Code', monospace; position: relative; margin: 1rem 0; }
+        .keyword { color: #c678dd; font-weight: bold; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .comment { color: #5c6370; font-style: italic; }
+        .section-title { border-left: 5px solid var(--accent-color); padding-left: 15px; margin-top: 3rem; color: var(--primary-color); }
+        .type-badge { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#"><i class="fas fa-database me-2"></i>MySQL Урок</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#intro">Въведение</a></li>
+                <li class="nav-item"><a class="nav-link" href="#types">Типове данни</a></li>
+                <li class="nav-item"><a class="nav-link" href="#ddl">Структура</a></li>
+                <li class="nav-item"><a class="nav-link" href="#select">Заявки</a></li>
+                <li class="nav-item"><a class="nav-link" href="#practice">Упражнение</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-<header>
-    <h1>Интерактивен урок: Връзки между таблици (JOIN)</h1>
-    <p>Визуализация, примери и задачи за SQL съединения</p>
+<header class="hero-header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Интерактивен урок: Връзки между таблици (JOIN)</h1>
+            <h2>Визуализация, примери и задачи за SQL съединения</h2>
+        <p class="lead">Пълен курс по MySQL за ученици от 11. клас</p>
+    </div>
 </header>
+
+
+
 
 <div class="container">
     
@@ -305,3 +342,4 @@
 </body>
 
 </html>
+
