@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивен SQL JOIN Урок</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        section {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        h2 { color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+
+        pre {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        .sql-keyword { color: #fbbf24; font-weight: bold; }
+        .sql-table { color: #60a5fa; }
+
+        .quiz-container {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-left: 5px solid var(--primary);
+            margin-top: 1rem;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        .feedback { margin-top: 1rem; font-weight: bold; display: none; }
+        .correct { color: var(--success); }
+        .wrong { color: var(--danger); }
+
+        .visual-aid {
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #fff;
+            border: 1px dashed #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SQL JOIN: Майсторски клас</h1>
+    <p>Научете как да свързвате данни като професионалист</p>
+</header>
+
+<div class="container">
+
+    <section>
+        <h2>1. Какво е JOIN?</h2>
+        <p>В релационните бази данни информацията често е разделена в различни таблици. <strong>JOIN</strong> е операцията, която ни позволява да комбинираме редове от две или повече таблици въз основа на свързана колона между тях.</p>
+        
+        <div class="visual-aid">
+            
+        </div>
+
+        <div class="quiz-container">
+            <p><strong>Въпрос:</strong> Коя клауза използваме, за да дефинираме по кой ключ се свързват таблиците?</p>
+            <input type="radio" name="q1" value="wrong"> WHERE <br>
+            <input type="radio" name="q1" value="correct"> ON <br>
+            <input type="radio" name="q1" value="wrong"> GROUP BY <br><br>
+            <button onclick="checkAnswer(this, 'correct')">Провери</button>
+            <div class="feedback"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>2. INNER JOIN</h2>
+        <p>Това е най-често използваният вид. Той връща записи само ако има съвпадение и в двете таблици.</p>
+        <pre>
+<span class="sql-keyword">SELECT</span> e.FirstName, d.Name 
+<span class="sql-keyword">FROM</span> Employees e 
+<span class="sql-keyword">INNER JOIN</span> Departments d <span class="sql-keyword">ON</span> e.DepartmentID = d.Id;</pre>
+        
+        <div class="quiz-container">
+            <p><strong>Задача:</strong> Ако в таблица "Служители" има човек без "DepartmentID", ще се появи ли той в INNER JOIN резултата?</p>
+            <button onclick="alert('Не, INNER JOIN изисква задължително съвпадение в двете страни!')">Виж отговора</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. LEFT (OUTER) JOIN</h2>
+        <p>Връща <strong>всички</strong> записи от лявата таблица и съвпадащите записи от дясната. Ако няма съвпадение, резултатът отдясно е <code>NULL</code>.</p>
+        
+        <div class="visual-aid">
+            
+        </div>
+
+        <pre>
+<span class="sql-keyword">SELECT</span> e.FirstName, p.ProjectName 
+<span class="sql-keyword">FROM</span> Employees e 
+<span class="sql-keyword">LEFT JOIN</span> Projects p <span class="sql-keyword">ON</span> e.ID = p.EmployeeID;</pre>
+    </section>
+
+    <section>
+        <h2>4. SELF JOIN</h2>
+        <p>Понякога трябва да съединим таблица със самата нея. Например, за да разберем кой е мениджър на даден служител.</p>
+        <pre>
+<span class="sql-keyword">SELECT</span> e.Name <span class="sql-keyword">AS</span> Employee, m.Name <span class="sql-keyword">AS</span> Manager
+<span class="sql-keyword">FROM</span> Employees e
+<span class="sql-keyword">JOIN</span> Employees m <span class="sql-keyword">ON</span> e.ManagerID = m.ID;</pre>
+    </section>
+
+    <section style="background: #1e293b; color: white;">
+        <h2 style="color: #60a5fa; border-color: #334155;">🏁 Тест за финал</h2>
+        <p>Подредете правилната последователност за INNER JOIN заявка:</p>
+        <div id="sort-exercise">
+            <ol>
+                <li>FROM Employees e</li>
+                <li>SELECT e.FirstName, d.Name</li>
+                <li>ON e.DeptID = d.ID</li>
+                <li>JOIN Departments d</li>
+            </ol>
+            <p><em>(Напишете правилната номерация, напр. 2-1-4-3)</em></p>
+            <input type="text" id="final-input" placeholder="2-1-4-3" style="padding: 5px; border-radius: 4px;">
+            <button onclick="checkFinal()">Провери</button>
+            <p id="final-feedback"></p>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    function checkAnswer(btn, correctValue) {
+        const container = btn.parentElement;
+        const selected = container.querySelector('input[type="radio"]:checked');
+        const feedback = container.querySelector('.feedback');
+        
+        if (!selected) {
+            alert("Моля, избери отговор!");
+            return;
+        }
+
+        feedback.style.display = "block";
+        if (selected.value === correctValue) {
+            feedback.textContent = "✅ Браво! Точно така.";
+            feedback.className = "feedback correct";
+        } else {
+            feedback.textContent = "❌ Опитай пак. Помисли за структурата на JOIN.";
+            feedback.className = "feedback wrong";
+        }
+    }
+
+    function checkFinal() {
+        const val = document.getElementById('final-input').value;
+        const fb = document.getElementById('final-feedback');
+        if (val === "2-1-4-3") {
+            fb.innerHTML = "🏆 Перфектно! Ти вече си SQL експерт!";
+            fb.style.color = "#4ade80";
+        } else {
+            fb.innerHTML = "Почти... Спомни си: Първо избираме колони, после основна таблица, после Join и накрая условие.";
+            fb.style.color = "#f87171";
+        }
+    }
+</script>
+
+</body>
+</html>

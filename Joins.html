@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL JOIN Интерактивен Урок</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background-color: #f4f4f9; color: #333; margin: 0; padding: 0; }
+        header { background: #2c3e50; color: #fff; padding: 1rem 0; text-align: center; }
+        .container { width: 90%; max-width: 1000px; margin: 20px auto; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
+        h1, h2, h3 { color: #2c3e50; }
+        .module { display: none; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .module.active { display: block; animation: fadeIn 0.5s; }
+        
+        /* Styles for Code Blocks */
+        .code-block { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; overflow-x: auto; margin: 10px 0; }
+        .keyword { color: #c678dd; } .string { color: #98c379; } .function { color: #61afef; }
+        
+        /* Styles for Buttons */
+        button { background: #3498db; color: #fff; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-size: 16px; margin: 5px; transition: background 0.3s; }
+        button:hover { background: #2980b9; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        
+        /* Quiz and Task Styles */
+        .quiz, .task { background: #e8f6f3; padding: 15px; border-left: 5px solid #1abc9c; margin-top: 20px; border-radius: 4px; }
+        .task { background: #fff8e1; border-left-color: #f1c40f; }
+        .answer, .solution { display: none; margin-top: 10px; font-weight: bold; }
+        .correct { color: green; } .incorrect { color: red; }
+
+        /* DATA VISUALIZATION TABLES */
+        .visual-container { display: flex; flex-wrap: wrap; gap: 20px; margin: 20px 0; align-items: flex-start; }
+        .db-table { border-collapse: collapse; font-size: 0.9em; box-shadow: 0 0 5px rgba(0,0,0,0.1); background: white; }
+        .db-table th { background: #34495e; color: white; padding: 8px; text-align: left; }
+        .db-table td { border: 1px solid #ddd; padding: 8px; }
+        .db-table caption { font-weight: bold; margin-bottom: 5px; color: #555; }
+        
+        /* Highlighting rows */
+        .match-row { background-color: #d4efdf; } /* Greenish for match */
+        .no-match { background-color: #fadbd8; } /* Reddish for no match */
+        .null-val { color: #e74c3c; font-style: italic; }
+        .arrow { font-size: 2em; align-self: center; color: #7f8c8d; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Интерактивен урок: Връзки между таблици (JOIN)</h1>
+    <p>Визуализация, примери и задачи за SQL съединения</p>
+</header>
+
+<div class="container">
+    
+    <div style="margin-bottom: 20px; text-align: center;">
+        <button onclick="showModule(1)">1. Декартово произведение</button>
+        <button onclick="showModule(2)">2. INNER JOIN</button>
+        <button onclick="showModule(3)">3. LEFT & RIGHT JOIN</button>
+        <button onclick="showModule(4)">4. FULL & CROSS JOIN</button>
+    </div>
+
+    <div id="module-1" class="module active">
+        <h2>1. Въведение и Декартово произведение</h2>
+        <p>Преди да говорим за правилните връзки, нека видим какво става, когато сгрешим. Ако свържем две таблици без условие (WHERE/ON), се получава <strong>Декартово произведение (Cartesian Product)</strong>.</p>
+        
+        <div class="visual-container">
+            <div>
+                <table class="db-table">
+                    <caption>Таблица: Colors</caption>
+                    <tr><th>Color</th></tr>
+                    <tr><td>🔴 Red</td></tr>
+                    <tr><td>🔵 Blue</td></tr>
+                </table>
+            </div>
+            <div class="arrow">✖️</div>
+            <div>
+                <table class="db-table">
+                    <caption>Таблица: Sizes</caption>
+                    <tr><th>Size</th></tr>
+                    <tr><td>S</td></tr>
+                    <tr><td>M</td></tr>
+                    <tr><td>L</td></tr>
+                </table>
+            </div>
+            <div class="arrow">➡️</div>
+            <div>
+                <table class="db-table">
+                    <caption>РЕЗУЛТАТ (2 * 3 = 6 реда)</caption>
+                    <tr><th>Color</th><th>Size</th></tr>
+                    <tr><td>🔴 Red</td><td>S</td></tr>
+                    <tr><td>🔴 Red</td><td>M</td></tr>
+                    <tr><td>🔴 Red</td><td>L</td></tr>
+                    <tr><td>🔵 Blue</td><td>S</td></tr>
+                    <tr><td>🔵 Blue</td><td>M</td></tr>
+                    <tr><td>🔵 Blue</td><td>L</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Colors, Sizes;
+        </div>
+
+        <div class="quiz">
+            <h3>📝 Проверка на знанията</h3>
+            <p>Ако Таблица А има 10 реда, а Таблица Б има 5 реда, колко реда ще върне декартовото произведение?</p>
+            <label><input type="radio" name="q1" value="a"> 15</label><br>
+            <label><input type="radio" name="q1" value="b"> 50</label><br>
+            <label><input type="radio" name="q1" value="c"> 5</label><br>
+            <button onclick="checkAnswer('q1', 'b')">Провери</button>
+            <p id="ans-q1" class="answer"></p>
+        </div>
+    </div>
+
+    <div id="module-2" class="module">
+        <h2>2. INNER JOIN (Вътрешно съединение)</h2>
+        <p>Връща само редовете, които имат съвпадение и в двете таблици. Това е "сечението" на двете множества. Служителите без отдел и отделите без служители се игнорират.</p>
+
+        <div class="visual-container">
+            <div>
+                <table class="db-table">
+                    <caption>Employees (Служители)</caption>
+                    <tr><th>ID</th><th>Name</th><th>Dept_ID</th></tr>
+                    <tr class="match-row"><td>1</td><td>Ivan</td><td>10</td></tr>
+                    <tr class="match-row"><td>2</td><td>Maria</td><td>20</td></tr>
+                    <tr class="no-match"><td>3</td><td>Peter</td><td>NULL</td></tr>
+                </table>
+                <small>*Peter няма отдел</small>
+            </div>
+            <div class="arrow">➕</div>
+            <div>
+                <table class="db-table">
+                    <caption>Departments (Отдели)</caption>
+                    <tr><th>ID</th><th>Dept_Name</th></tr>
+                    <tr class="match-row"><td>10</td><td>Sales</td></tr>
+                    <tr class="match-row"><td>20</td><td>HR</td></tr>
+                    <tr class="no-match"><td>30</td><td>IT</td></tr>
+                </table>
+                <small>*В IT отдела няма хора</small>
+            </div>
+        </div>
+        
+        <div class="arrow" style="text-align:center; margin: 10px 0;">⬇️ INNER JOIN (Само съвпадащите) ⬇️</div>
+
+        <div class="visual-container" style="justify-content: center;">
+            <table class="db-table">
+                <caption>РЕЗУЛТАТ</caption>
+                <tr><th>Name</th><th>Dept_Name</th></tr>
+                <tr class="match-row"><td>Ivan</td><td>Sales</td></tr>
+                <tr class="match-row"><td>Maria</td><td>HR</td></tr>
+            </table>
+        </div>
+
+        <div class="code-block">
+            <span class="keyword">SELECT</span> e.Name, d.Dept_Name <br>
+            <span class="keyword">FROM</span> Employees e <br>
+            <span class="keyword">JOIN</span> Departments d <br>
+            <span class="keyword">ON</span> e.Dept_ID = d.ID;
+        </div>
+
+        <div class="task">
+            <h3>🛠️ Задача</h3>
+            <p>Имате таблица <code>Students</code> (id, name, city_id) и <code>Cities</code> (id, name). Напишете заявка, която показва името на студента и града му, но само за студенти, които са въвели валиден град.</p>
+            <button onclick="toggleSolution('sol-m2')">Виж решението</button>
+            <div id="sol-m2" class="solution">
+                <div class="code-block">
+                    <span class="keyword">SELECT</span> s.name, c.name <br>
+                    <span class="keyword">FROM</span> Students s <br>
+                    <span class="keyword">INNER JOIN</span> Cities c <br>
+                    <span class="keyword">ON</span> s.city_id = c.id;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="module-3" class="module">
+        <h2>3. OUTER JOIN (LEFT и RIGHT)</h2>
+        <p>Тези връзки позволяват да запазим данните от едната таблица, дори да няма съвпадение в другата.</p>
+
+        <h3>LEFT JOIN (Ляво съединение)</h3>
+        <p>Взима ВСИЧКО от лявата таблица (Employees). Ако няма отдел, пише NULL.</p>
+        
+        <div class="visual-container" style="justify-content: center;">
+            <table class="db-table">
+                <caption>РЕЗУЛТАТ (LEFT JOIN)</caption>
+                <tr><th>Name</th><th>Dept_ID</th><th>Dept_Name</th></tr>
+                <tr class="match-row"><td>Ivan</td><td>10</td><td>Sales</td></tr>
+                <tr class="match-row"><td>Maria</td><td>20</td><td>HR</td></tr>
+                <tr class="no-match"><td>Peter</td><td>NULL</td><td class="null-val">NULL</td></tr>
+            </table>
+        </div>
+        <p><em>*Забележете: Peter присъства, въпреки че няма отдел.</em></p>
+
+        <h3>RIGHT JOIN (Дясно съединение)</h3>
+        <p>Взима ВСИЧКО от дясната таблица (Departments). Ако отделът няма служители, името на служителя е NULL.</p>
+
+        <div class="visual-container" style="justify-content: center;">
+            <table class="db-table">
+                <caption>РЕЗУЛТАТ (RIGHT JOIN)</caption>
+                <tr><th>Name</th><th>Dept_Name</th></tr>
+                <tr class="match-row"><td>Ivan</td><td>Sales</td></tr>
+                <tr class="match-row"><td>Maria</td><td>HR</td></tr>
+                <tr class="no-match"><td class="null-val">NULL</td><td>IT</td></tr>
+            </table>
+        </div>
+        <p><em>*Забележете: IT отделът присъства, въпреки че няма служители.</em></p>
+
+        <div class="quiz">
+            <h3>📝 Въпрос</h3>
+            <p>Коя заявка ще използвате, за да намерите всички клиенти, които НИКОГА не са правили поръчка?</p>
+            <label><input type="radio" name="q3" value="a"> INNER JOIN</label><br>
+            <label><input type="radio" name="q3" value="b"> LEFT JOIN ... WHERE order_id IS NULL</label><br>
+            <button onclick="checkAnswer('q3', 'b')">Провери</button>
+            <p id="ans-q3" class="answer"></p>
+        </div>
+    </div>
+
+    <div id="module-4" class="module">
+        <h2>4. FULL OUTER JOIN & Обобщение</h2>
+        
+        <h3>FULL OUTER JOIN</h3>
+        <p>Комбинация от LEFT и RIGHT. Връща всичко от двете таблици. Ако няма съвпадение - NULL.</p>
+
+        <div class="visual-container" style="justify-content: center;">
+            <table class="db-table">
+                <caption>РЕЗУЛТАТ (FULL JOIN)</caption>
+                <tr><th>Name</th><th>Dept_Name</th></tr>
+                <tr class="match-row"><td>Ivan</td><td>Sales</td></tr>
+                <tr class="match-row"><td>Maria</td><td>HR</td></tr>
+                <tr class="no-match"><td>Peter</td><td class="null-val">NULL</td></tr>
+                <tr class="no-match"><td class="null-val">NULL</td><td>IT</td></tr>
+            </table>
+        </div>
+
+        <div class="task">
+            <h3>🛠️ Задача за шампиони</h3>
+            <p>Напишете заявка, която показва всички възможни двойки "Служител - Проект" (всеки служител да участва във всеки проект), за да планираме график.</p>
+            <button onclick="toggleSolution('sol-m4')">Виж решението</button>
+            <div id="sol-m4" class="solution">
+                <p>Трябва да използваме CROSS JOIN (Декартово произведение), защото искаме всички комбинации.</p>
+                <div class="code-block">
+                    <span class="keyword">SELECT</span> e.Name, p.ProjectName <br>
+                    <span class="keyword">FROM</span> Employees e <br>
+                    <span class="keyword">CROSS JOIN</span> Projects p;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button onclick="changeModule(-1)">⬅️ Предишен</button>
+        <button onclick="changeModule(1)">Следващ ➡️</button>
+    </div>
+
+</div>
+
+<script>
+    let currentModule = 1;
+    const totalModules = 4;
+
+    function showModule(moduleId) {
+        for(let i=1; i<=totalModules; i++) {
+            document.getElementById('module-'+i).classList.remove('active');
+        }
+        document.getElementById('module-'+moduleId).classList.add('active');
+        currentModule = moduleId;
+    }
+
+    function changeModule(direction) {
+        let next = currentModule + direction;
+        if(next >= 1 && next <= totalModules) {
+            showModule(next);
+        }
+    }
+
+    function checkAnswer(questionId, correctAnswer) {
+        const options = document.getElementsByName(questionId);
+        let selected;
+        for(const option of options) {
+            if(option.checked) selected = option.value;
+        }
+        const resultElem = document.getElementById('ans-' + questionId);
+        resultElem.style.display = 'block';
+        if(selected === correctAnswer) {
+            resultElem.textContent = "✅ Правилен отговор!";
+            resultElem.className = "answer correct";
+        } else {
+            resultElem.textContent = "❌ Грешен отговор.";
+            resultElem.className = "answer incorrect";
+        }
+    }
+
+    function toggleSolution(id) {
+        const sol = document.getElementById(id);
+        sol.style.display = (sol.style.display === 'block') ? 'none' : 'block';
+    }
+</script>
+
+</body>
+</html>
