@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="bg" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Агрегация и Композиция в UML | Интерактивен Урок</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 350px; 
+            max-height: 400px; 
+        } 
+        @media (min-width: 768px) { 
+            .chart-container { height: 400px; } 
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+    <!-- Chosen Palette: Warm neutral background (Slate-50) with subtle grid. Primary accents are Indigo-600 (Composition/Strong) and Emerald-500 (Aggregation/Weak) to visually separate the two core concepts. -->
+    <!-- Application Structure Plan: The SPA is structured as a progressive interactive learning journey. 1. Intro (Context), 2. Core Concepts (Side-by-side theory cards with visual comparison), 3. Data Clarity (Radar Chart visualizing abstract traits), 4. Interactive Lab (Clickable examples for active learning), 5. Decision Quiz (The 'Golden Questions' applied), 6. Mission (Homework). This structure transforms a static presentation into an active discovery process. -->
+    <!-- Visualization & Content Choices: Report Info: Agg/Comp Characteristics -> Goal: Compare theoretical strength -> Viz: Radar Chart -> Interaction: Hover tooltips -> Justification: Radar chart effectively contrasts multi-dimensional abstract concepts (Dependency, Ownership, Strength). Report Info: Practical Examples -> Goal: Application -> Viz: Interactive dashboard panel -> Interaction: Button clicks revealing details -> Justification: Encourages exploration rather than passive reading. Confirming NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="text-slate-800 font-sans antialiased">
+
+    <nav class="fixed top-0 w-full z-50 glass-panel shadow-sm border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <span class="text-2xl text-indigo-600 font-bold">&#9670;</span>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">UML Мастърклас</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#intro" class="text-slate-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Въведение</a>
+                    <a href="#theory" class="text-slate-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Теория</a>
+                    <a href="#lab" class="text-slate-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Лаборатория</a>
+                    <a href="#quiz" class="text-slate-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Златни Въпроси</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+
+        <section id="intro" class="text-center space-y-6 pt-12">
+            <div class="inline-block px-4 py-1.5 rounded-full bg-indigo-100 text-indigo-800 text-sm font-semibold tracking-wide uppercase mb-4 shadow-sm border border-indigo-200">
+                Моделиране на данни &bull; 11 Клас
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
+                Връзката <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-500">"ИМА" (Has-A)</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-600">
+                Досега научихме за домейн моделите, класовете и наследяването. Днес ще разгледаме как обектите се свързват и "притежават" един друг чрез две специални форми на асоциация: <strong class="text-emerald-600">Агрегация</strong> и <strong class="text-indigo-600">Композиция</strong>.
+            </p>
+            <div class="flex justify-center gap-4 mt-8">
+                <a href="#theory" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all transform hover:-translate-y-0.5">
+                    Започни урока
+                </a>
+            </div>
+        </section>
+
+        <section id="theory" class="scroll-mt-24">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Двата свята на връзките</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto">
+                    Разбирането на разликата между агрегация и композиция е ключово за правилното моделиране на софтуер. В тази секция ще сравним техните характеристики, символика и "твърдост".
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white rounded-2xl p-8 shadow-sm border-t-4 border-emerald-500 hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 text-9xl text-emerald-50 opacity-50 group-hover:scale-110 transition-transform">&#9671;</div>
+                    <div class="flex items-center gap-4 mb-6 relative z-10">
+                        <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-3xl font-bold border border-emerald-200">
+                            &#9671;
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-800">Агрегация</h3>
+                            <p class="text-emerald-600 font-medium text-sm">Слаба връзка (Weak has-a)</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-4 relative z-10">
+                        <li class="flex items-start gap-3">
+                            <span class="text-emerald-500 font-bold mt-0.5">&check;</span>
+                            <span class="text-slate-700"><strong>Определение:</strong> Връзка "цяло-част", при която частта може да съществува независимо.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-emerald-500 font-bold mt-0.5">&check;</span>
+                            <span class="text-slate-700"><strong>Собственост:</strong> Споделена. Частта може да е в много "цели".</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-emerald-500 font-bold mt-0.5">&check;</span>
+                            <span class="text-slate-700"><strong>Жизнен цикъл:</strong> Ако "цялото" бъде унищожено, "частите" оцеляват.</span>
+                        </li>
+                    </ul>
+                    <div class="mt-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100 relative z-10">
+                        <strong class="text-emerald-800 block mb-1">Пример:</strong>
+                        <span class="text-emerald-700 text-sm">Университет и Преподаватели. Ако университетът затвори, преподавателите продължават да съществуват като личности и професионалисти.</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-sm border-t-4 border-indigo-600 hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 text-9xl text-indigo-50 opacity-50 group-hover:scale-110 transition-transform">&#9670;</div>
+                    <div class="flex items-center gap-4 mb-6 relative z-10">
+                        <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-3xl font-bold border border-indigo-200">
+                            &#9670;
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-800">Композиция</h3>
+                            <p class="text-indigo-600 font-medium text-sm">Силна връзка (Strong has-a)</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-4 relative z-10">
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigo-500 font-bold mt-0.5">&check;</span>
+                            <span class="text-slate-700"><strong>Определение:</strong> Строга връзка, при която частта не може да съществува без цялото.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigo-500 font-bold mt-0.5">&check;</span>
+                            <span class="text-slate-700"><strong>Собственост:</strong> Изключителна. Частта е само в едно "цяло".</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigo-500 font-bold mt-0.5">&check;</span>
+                            <span class="text-slate-700"><strong>Жизнен цикъл:</strong> Ако "цялото" бъде унищожено, "частите" се унищожават с него.</span>
+                        </li>
+                    </ul>
+                    <div class="mt-6 p-4 bg-indigo-50 rounded-lg border border-indigo-100 relative z-10">
+                        <strong class="text-indigo-800 block mb-1">Пример:</strong>
+                        <span class="text-indigo-700 text-sm">Сграда и Стаи. Не можете да съборите сградата и да запазите стаите й "да висят във въздуха".</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="text-xl font-bold text-center text-slate-800 mb-6">Визуално сравнение на характеристиките</h3>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="lab" class="scroll-mt-24">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Интерактивна Лаборатория</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto">
+                    Изберете обект от системите по-долу, за да анализираме каква е връзката му с главното "Цяло". Този практически опит ще ви помогне да разпознавате връзките в реални софтуерни архитектури.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-slate-800 mb-4 border-b pb-2 uppercase text-sm tracking-wide">Система А: Компютър</h4>
+                        <div class="space-y-3">
+                            <button onclick="updateLab('mouse')" class="w-full text-left px-4 py-3 rounded-lg bg-white border border-slate-300 hover:border-indigo-400 hover:shadow-sm transition-all text-slate-700 font-medium flex justify-between items-center group">
+                                <span>&#128433;&#65039; Периферия (Мишка)</span>
+                                <span class="text-slate-400 group-hover:text-indigo-500">&#8594;</span>
+                            </button>
+                            <button onclick="updateLab('cpu')" class="w-full text-left px-4 py-3 rounded-lg bg-white border border-slate-300 hover:border-indigo-400 hover:shadow-sm transition-all text-slate-700 font-medium flex justify-between items-center group">
+                                <span>&#128421;&#65039; Процесор (CPU)</span>
+                                <span class="text-slate-400 group-hover:text-indigo-500">&#8594;</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-slate-800 mb-4 border-b pb-2 uppercase text-sm tracking-wide">Система Б: E-Commerce</h4>
+                        <div class="space-y-3">
+                            <button onclick="updateLab('cart')" class="w-full text-left px-4 py-3 rounded-lg bg-white border border-slate-300 hover:border-indigo-400 hover:shadow-sm transition-all text-slate-700 font-medium flex justify-between items-center group">
+                                <span>&#128722; Количка и Продукти</span>
+                                <span class="text-slate-400 group-hover:text-indigo-500">&#8594;</span>
+                            </button>
+                            <button onclick="updateLab('order')" class="w-full text-left px-4 py-3 rounded-lg bg-white border border-slate-300 hover:border-indigo-400 hover:shadow-sm transition-all text-slate-700 font-medium flex justify-between items-center group">
+                                <span>&#128203; Поръчка и Редове</span>
+                                <span class="text-slate-400 group-hover:text-indigo-500">&#8594;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div id="lab-display" class="bg-white h-full rounded-2xl shadow-sm border border-slate-200 p-8 flex flex-col justify-center items-center text-center transition-all duration-300">
+                        <div class="text-6xl mb-6 text-slate-300" id="lab-icon">&#128269;</div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2" id="lab-title">Изберете обект от менюто</h3>
+                        <div id="lab-badge" class="hidden mb-6 inline-block px-4 py-1 rounded-full text-sm font-bold border"></div>
+                        <p class="text-slate-600 text-lg max-w-lg" id="lab-desc">
+                            Кликнете върху компонент от лявата страна, за да видите детайлен анализ на типа връзка (Агрегация или Композиция) с неговото "цяло".
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="scroll-mt-24">
+            <div class="bg-indigo-900 rounded-3xl p-8 md:p-12 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 text-[20rem] text-indigo-800 opacity-20">&#10067;</div>
+                
+                <div class="relative z-10 max-w-3xl">
+                    <h2 class="text-3xl font-bold mb-4">Златните въпроси (Алгоритъм за избор)</h2>
+                    <p class="text-indigo-200 text-lg mb-8">
+                        Когато проектирате UML диаграма и се колебаете кой ромб да използвате, прекарайте обектите през този интерактивен филтър.
+                    </p>
+
+                    <div id="quiz-step-1" class="bg-white/10 p-6 rounded-xl backdrop-blur-sm border border-white/20 mb-6 transition-all duration-300">
+                        <p class="font-semibold text-xl mb-6">Въпрос 1: Ако изтрия "Цялото", трябва ли "Частта" също задължително да изчезне?</p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="handleQuiz(1, 'yes')" class="flex-1 bg-white text-indigo-900 py-3 px-6 rounded-lg font-bold hover:bg-indigo-50 transition-colors">
+                                Да, частта умира
+                            </button>
+                            <button onclick="handleQuiz(1, 'no')" class="flex-1 bg-transparent border-2 border-white/50 text-white py-3 px-6 rounded-lg font-bold hover:bg-white/10 transition-colors">
+                                Не, частта оцелява
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-step-2" class="hidden bg-white/10 p-6 rounded-xl backdrop-blur-sm border border-white/20 mb-6 transition-all duration-300">
+                        <p class="font-semibold text-xl mb-6">Въпрос 2: Може ли "Частта" да принадлежи на повече от едно "Цяло" едновременно?</p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="handleQuiz(2, 'yes')" class="flex-1 bg-white text-indigo-900 py-3 px-6 rounded-lg font-bold hover:bg-indigo-50 transition-colors">
+                                Да, може
+                            </button>
+                            <button onclick="handleQuiz(2, 'no')" class="flex-1 bg-transparent border-2 border-white/50 text-white py-3 px-6 rounded-lg font-bold hover:bg-white/10 transition-colors">
+                                Не, принадлежи само на едно
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-result" class="hidden p-6 rounded-xl backdrop-blur-sm mb-6 transition-all duration-300 animate-fade-in text-center">
+                        <div class="text-6xl mb-4" id="quiz-result-icon"></div>
+                        <h3 class="text-3xl font-bold mb-2" id="quiz-result-title"></h3>
+                        <p class="text-lg text-white/80 mb-6" id="quiz-result-desc"></p>
+                        <button onclick="resetQuiz()" class="text-sm underline hover:text-indigo-200">Започни отначало</button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="homework" class="scroll-mt-24 pb-12">
+            <div class="bg-amber-50 rounded-2xl p-8 border border-amber-200 shadow-sm relative">
+                <div class="absolute top-0 right-0 p-6 text-4xl text-amber-200">&#127919;</div>
+                <h2 class="text-2xl font-bold text-amber-900 mb-2">Мисия: Домашна работа</h2>
+                <p class="text-amber-800 mb-6">Моделирайте в UML следния домейн: <strong>"Футболен клуб"</strong>.</p>
+                
+                <div class="bg-white p-6 rounded-xl border border-amber-100">
+                    <p class="font-medium text-slate-700 mb-4">Помислете и начертайте каква е връзката (Агрегация или Композиция) между:</p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <span class="text-2xl">&#9917;</span>
+                            <span class="font-semibold text-slate-800">Клуб и Играчи</span>
+                        </li>
+                        <li class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <span class="text-2xl">&#127967;</span>
+                            <span class="font-semibold text-slate-800">Клуб и Стадион</span>
+                        </li>
+                        <li class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <span class="text-2xl">&#128218;</span>
+                            <span class="font-semibold text-slate-800">Клуб и История на мачовете</span>
+                        </li>
+                    </ul>
+                    <p class="mt-6 text-sm text-slate-500 italic">Съвет: Използвайте "Златните въпроси" от горната секция за всяка една от тези двойки.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm border-t border-slate-800">
+        <p>&copy; 2026 Урок по Моделиране на данни. Изработено за интерактивно обучение.</p>
+    </footer>
+
+    <script>
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: [
+                    'Сила на връзката', 
+                    'Зависимост на живота', 
+                    'Ексклузивност (Собственост)'
+                ],
+                datasets: [{
+                    label: 'Композиция (◆)',
+                    data: [10, 10, 10],
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(79, 70, 229, 1)'
+                }, {
+                    label: 'Агрегация (◇)',
+                    data: [3, 2, 2],
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(16, 185, 129, 1)'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                        pointLabels: {
+                            font: { size: 14, family: "'Inter', sans-serif" },
+                            color: '#475569'
+                        },
+                        ticks: { display: false, min: 0, max: 10 }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 14, family: "'Inter', sans-serif" },
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 14 },
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.r === 10) { label += 'Висока (Строга)'; }
+                                else { label += 'Ниска (Слаба)'; }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const labData = {
+            'mouse': { 
+                icon: '&#128433;&#65039;',
+                title: 'Връзка: Компютър - Мишка', 
+                type: 'Агрегация', 
+                symbol: '◇',
+                desc: 'Това е <strong>Агрегация</strong>. Можете да изключите мишката и да я включите в друг компютър. Тя съществува като обект напълно независимо от конкретния компютър.', 
+                colorClass: 'text-emerald-700',
+                bgClass: 'bg-emerald-100',
+                borderClass: 'border-emerald-200'
+            },
+            'cpu': { 
+                icon: '&#128421;&#65039;',
+                title: 'Връзка: Компютър - Процесор', 
+                type: 'Композиция',
+                symbol: '◆', 
+                desc: 'В контекста на логическото моделиране, това е <strong>Композиция</strong>. Компютърът не може да функционира и губи смисъла си като система без своите вътрешни, специфични компоненти.', 
+                colorClass: 'text-indigo-700',
+                bgClass: 'bg-indigo-100',
+                borderClass: 'border-indigo-200'
+            },
+            'cart': { 
+                icon: '&#128722;',
+                title: 'Връзка: Количка - Продукти', 
+                type: 'Агрегация', 
+                symbol: '◇',
+                desc: 'Това е <strong>Агрегация</strong>. Ако потребителят изтрие количката си, продуктите продължават да съществуват в каталога на магазина. Животът им не зависи от количката.', 
+                colorClass: 'text-emerald-700',
+                bgClass: 'bg-emerald-100',
+                borderClass: 'border-emerald-200'
+            },
+            'order': { 
+                icon: '&#128203;',
+                title: 'Връзка: Поръчка - Редове', 
+                type: 'Композиция', 
+                symbol: '◆',
+                desc: 'Това е <strong>Композиция</strong>. Ако изтриете самата поръчка, нейните редове (които описват точно какво е купено в тази трансакция) губят смисъл и се изтриват заедно с нея.', 
+                colorClass: 'text-indigo-700',
+                bgClass: 'bg-indigo-100',
+                borderClass: 'border-indigo-200'
+            }
+        };
+
+        function updateLab(key) {
+            const data = labData[key];
+            const display = document.getElementById('lab-display');
+            
+            display.style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('lab-icon').innerHTML = data.icon;
+                document.getElementById('lab-title').innerText = data.title;
+                document.getElementById('lab-desc').innerHTML = data.desc;
+                
+                const badge = document.getElementById('lab-badge');
+                badge.innerHTML = `${data.type} ${data.symbol}`;
+                badge.className = `mb-6 inline-block px-4 py-1 rounded-full text-sm font-bold border ${data.colorClass} ${data.bgClass} ${data.borderClass}`;
+                badge.classList.remove('hidden');
+
+                display.style.opacity = '1';
+            }, 200);
+        }
+
+        function handleQuiz(step, answer) {
+            const step1 = document.getElementById('quiz-step-1');
+            const step2 = document.getElementById('quiz-step-2');
+            const result = document.getElementById('quiz-result');
+            
+            if (step === 1) {
+                if (answer === 'yes') {
+                    showResult('Композиция ◆', 'Тъй като частта не може да оцелее без цялото, това е силна връзка - Композиция.', 'bg-indigo-600', '&#9670;');
+                    step1.classList.add('hidden');
+                } else {
+                    step1.classList.add('hidden');
+                    step2.classList.remove('hidden');
+                }
+            } else if (step === 2) {
+                if (answer === 'yes') {
+                    showResult('Агрегация ◇', 'Щом частта оцелява и може да се споделя, това е слаба връзка - Агрегация.', 'bg-emerald-500', '&#9671;');
+                } else {
+                    showResult('Обикновена Асоциация / Специфична Агрегация', 'Ако частта оцелява, но не се споделя, обикновено клоним към Агрегация, но понякога просто маркираме стандартна асоциация (1 към 1).', 'bg-slate-600', '&#8594;');
+                }
+                step2.classList.add('hidden');
+            }
+        }
+
+        function showResult(title, desc, bgClass, icon) {
+            const resultEl = document.getElementById('quiz-result');
+            document.getElementById('quiz-result-title').innerText = title;
+            document.getElementById('quiz-result-desc').innerText = desc;
+            document.getElementById('quiz-result-icon').innerHTML = icon;
+            
+            resultEl.className = `p-6 rounded-xl backdrop-blur-sm mb-6 transition-all duration-500 text-center ${bgClass}`;
+            resultEl.classList.remove('hidden');
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-step-2').classList.add('hidden');
+            document.getElementById('quiz-step-1').classList.remove('hidden');
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
