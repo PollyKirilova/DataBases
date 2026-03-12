@@ -6,14 +6,7 @@
     <title>Интерактивен Урок: SQL OUTER JOIN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Warm Neutrals with Blue/Green Accents (bg-stone-50, text-stone-800, blue-600, green-600) -->
-    <!-- Application Structure Plan: The application uses a top-down scrollable thematic structure. It starts with visual theory (CSS Venn diagrams), moves to a practical interactive data sandbox (showing raw tables and dynamic join results), introduces advanced filtering (NULL checks), visualizes the row output via Chart.js, and concludes with self-assessment exercises. This structure transforms static text into an exploratory learning journey, prioritizing comprehension of data merging before code memorization. -->
-    <!-- Visualization & Content Choices: 
-         1. Theory -> Goal: Explain concept visually -> Method: CSS-based interactive Venn diagram (NO SVG) -> Library/Method: HTML/Tailwind + JS toggle.
-         2. Data Example -> Goal: Show table merging -> Method: Interactive HTML tables -> Library/Method: Vanilla JS DOM manipulation.
-         3. Row Counting -> Goal: Compare JOIN efficiencies/outputs -> Method: Bar Chart -> Library/Method: Chart.js in constrained container.
-         Confirming NO SVG graphics used. Confirming NO Mermaid JS used. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
     <style>
         body {
             background-color: #fafaf9;
@@ -223,6 +216,55 @@ ON Students.StudentID = LibraryCards.StudentID;</pre>
                 <canvas id="joinChart"></canvas>
             </div>
         </section>
+ <section id="advanced-multiple-tables" class="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-stone-200">
+            <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-stone-800">4. Верижни съединения (3+ таблици)</h2>
+            <p class="mb-6 text-stone-600">Често се налага да свържем повече от две таблици. Редът на съединяване е критичен. Ако използваме <code class="bg-stone-100 px-1 py-0.5 rounded text-blue-600">LEFT JOIN</code>, ние запазваме всички данни от началото на веригата.</p>
+
+            <div class="p-4 bg-blue-50 border-l-4 border-blue-500 mb-8">
+                <p class="text-blue-900 font-medium italic text-sm">Сценарий: Искаме списък на ВСИЧКИ ученици, техните карти (ако имат) и имената на заетите от тях книги (ако има такива).</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="text-xs p-3 bg-stone-50 border rounded">
+                    <p class="font-bold border-b mb-1">Students</p>
+                    ID: 1 (Иван)<br>ID: 2 (Мария)<br>ID: 3 (Петър)
+                </div>
+                <div class="text-xs p-3 bg-stone-50 border rounded">
+                    <p class="font-bold border-b mb-1">LibraryCards</p>
+                    Card: 101 (Stud: 1)<br>Card: 102 (Stud: 2)
+                </div>
+                <div class="text-xs p-3 bg-stone-50 border rounded">
+                    <p class="font-bold border-b mb-1">BorrowedBooks</p>
+                    Card: 101 ("SQL Basics")
+                </div>
+            </div>
+
+            <div class="bg-stone-900 text-stone-100 rounded-lg p-4 mb-6 font-mono text-xs overflow-x-auto shadow-inner">
+<pre>SELECT S.Name, C.CardID, B.BookTitle
+FROM Students S
+LEFT JOIN LibraryCards C ON S.StudentID = C.StudentID
+LEFT JOIN BorrowedBooks B ON C.CardID = B.CardID;</pre>
+            </div>
+
+            <div class="overflow-x-auto bg-white rounded-lg border border-stone-200 mb-4">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead>
+                        <tr class="bg-stone-100 uppercase tracking-wider">
+                            <th class="border p-2">S.Name</th>
+                            <th class="border p-2">C.CardID</th>
+                            <th class="border p-2">B.BookTitle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="border p-2">Иван</td><td class="border p-2">101</td><td class="border p-2">SQL Basics</td></tr>
+                        <tr><td class="border p-2">Мария</td><td class="border p-2">102</td><td class="border p-2 text-red-500 italic">NULL (Няма книга)</td></tr>
+                        <tr><td class="border p-2">Петър</td><td class="border p-2 text-red-500 italic">NULL (Няма карта)</td><td class="border p-2 text-red-500 italic">NULL</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-sm text-stone-500">Забележете как Петър "пренася" своята липса на карта към липса на книга, запазвайки се в крайния резултат.</p>
+        </section>
+
 
         <section id="exercises" class="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-stone-200">
             <h2 class="text-2xl font-bold mb-6 border-b pb-2 text-stone-800">Практически упражнения</h2>
@@ -250,14 +292,55 @@ WHERE Departments.DeptID IS NULL;</pre>
                 </div>
             </div>
         </section>
+ <section id="exercises" class="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-stone-200">
+            <h2 class="text-2xl font-bold mb-6 border-b pb-2 text-stone-800">Сложни Практически Упражнения</h2>
+            
+            <div class="mb-8 p-4 border-l-4 border-amber-400 bg-amber-50">
+                <h3 class="text-lg font-bold mb-2">Задача 4: Тройно съединение на Поръчки</h3>
+                <p class="text-stone-600 mb-4 italic">Таблици: <code>Customers</code> (CustID, Name), <code>Orders</code> (OrderID, CustID, Date), <code>OrderItems</code> (ItemID, OrderID, ProdID).</p>
+                <p class="text-stone-800 mb-4">Напишете заявка, която извежда имената на всички клиенти и детайлите на техните поръчки. Трябва да видите и клиентите, които <strong>никога не са поръчвали</strong>.</p>
+                <button onclick="toggleAnswer('ans4')" class="text-sm font-bold text-blue-600 hover:text-blue-800 underline mb-2">Покажи отговора</button>
+                <div id="ans4" class="hidden bg-stone-900 text-stone-100 p-4 rounded-lg font-mono text-sm overflow-x-auto shadow-inner">
+<pre>SELECT Customers.Name, Orders.OrderID, OrderItems.ProdID
+FROM Customers
+LEFT JOIN Orders ON Customers.CustID = Orders.CustID
+LEFT JOIN OrderItems ON Orders.OrderID = OrderItems.OrderID;</pre>
+                </div>
+            </div>
+
+            <div class="mb-8 p-4 border-l-4 border-red-400 bg-red-50">
+                <h3 class="text-lg font-bold mb-2">Задача 5: Откриване на "мъртви" категории</h3>
+                <p class="text-stone-600 mb-4 italic">Таблици: <code>Categories</code> (CatID, Name), <code>Products</code> (ProdID, CatID), <code>Sales</code> (SaleID, ProdID).</p>
+                <p class="text-stone-800 mb-4">Намерете имената на всички категории, в които има продукти, които <strong>никога не са били продавани</strong>.</p>
+                <button onclick="toggleAnswer('ans5')" class="text-sm font-bold text-blue-600 hover:text-blue-800 underline mb-2">Покажи отговора</button>
+                <div id="ans5" class="hidden bg-stone-900 text-stone-100 p-4 rounded-lg font-mono text-sm overflow-x-auto shadow-inner">
+<pre>SELECT DISTINCT Categories.Name
+FROM Categories
+JOIN Products ON Categories.CatID = Products.CatID -- Само категории с продукти
+LEFT JOIN Sales ON Products.ProdID = Sales.ProdID
+WHERE Sales.SaleID IS NULL; -- Продуктът няма продажба</pre>
+                </div>
+            </div>
+
+            <div class="p-4 border-l-4 border-purple-400 bg-purple-50">
+                <h3 class="text-lg font-bold mb-2">Задача 6: Екипи без Лидери и Проекти</h3>
+                <p class="text-stone-600 mb-4">Изведете списък на всички екипи (<code>Teams</code>), техните лидери (<code>Managers</code>) и текущите им проекти (<code>Projects</code>). Ако екипът няма лидер или проект, той пак трябва да фигурира.</p>
+                <button onclick="toggleAnswer('ans6')" class="text-sm font-bold text-blue-600 hover:text-blue-800 underline mb-2">Покажи отговора</button>
+                <div id="ans6" class="hidden bg-stone-900 text-stone-100 p-4 rounded-lg font-mono text-sm overflow-x-auto shadow-inner">
+<pre>SELECT Teams.TeamName, Managers.Name, Projects.Title
+FROM Teams
+LEFT JOIN Managers ON Teams.ManagerID = Managers.ID
+LEFT JOIN Projects ON Teams.ProjectID = Projects.ID;</pre>
+                </div>
+            </div>
+        </section>
+
 
     </main>
 
-    <footer>
-    <p style="text-align: center; margin-top: 50px; color: #7f8c8d;">
-       © 2026 Бази данни. инж. Полина Кирилова-Михова
-    </p>
-</footer>
+    <footer class="bg-stone-900 text-stone-400 py-8 text-center text-sm">
+        <p>Създадено въз основа на урок за OUTER JOIN бази данни.</p>
+    </footer>
 
     <script>
         const btnLeft = document.getElementById('btn-left-join');
@@ -446,6 +529,194 @@ WHERE Departments.DeptID IS NULL;</pre>
         });
 
     </script>
-</body>
 
+ <script>
+        const btnLeft = document.getElementById('btn-left-join');
+        const btnRight = document.getElementById('btn-right-join');
+        const vennLeft = document.getElementById('venn-left');
+        const vennRight = document.getElementById('venn-right');
+        const vennDesc = document.getElementById('venn-description');
+        const codeJoinType = document.getElementById('code-join-type');
+        
+        let currentJoinType = 'LEFT';
+
+        const dataStudents = [
+            { id: 1, name: 'Иван' },
+            { id: 2, name: 'Мария' },
+            { id: 3, name: 'Петър' }
+        ];
+
+        const dataCards = [
+            { cardId: 101, studentId: 1 },
+            { cardId: 102, studentId: 2 }
+        ];
+
+        btnLeft.addEventListener('click', () => {
+            currentJoinType = 'LEFT';
+            btnLeft.classList.replace('bg-stone-100', 'bg-blue-100');
+            btnLeft.classList.replace('text-stone-800', 'text-blue-800');
+            btnLeft.classList.add('ring-2', 'ring-blue-500');
+            
+            btnRight.classList.replace('bg-green-100', 'bg-stone-100');
+            btnRight.classList.replace('text-green-800', 'text-stone-800');
+            btnRight.classList.remove('ring-2', 'ring-green-500');
+
+            vennLeft.classList.add('venn-active-left');
+            vennRight.classList.remove('venn-active-right');
+            vennRight.classList.add('bg-stone-200');
+            
+            vennDesc.textContent = "Връща всички редове от Лявата таблица (А) и само съвпадащите редове от Дясната таблица (Б).";
+            codeJoinType.textContent = "LEFT JOIN";
+            codeJoinType.className = "text-blue-400 font-bold";
+            hideResult();
+        });
+
+        btnRight.addEventListener('click', () => {
+            currentJoinType = 'RIGHT';
+            btnRight.classList.replace('bg-stone-100', 'bg-green-100');
+            btnRight.classList.replace('text-stone-800', 'text-green-800');
+            btnRight.classList.add('ring-2', 'ring-green-500');
+            
+            btnLeft.classList.replace('bg-blue-100', 'bg-stone-100');
+            btnLeft.classList.replace('text-blue-800', 'text-stone-800');
+            btnLeft.classList.remove('ring-2', 'ring-blue-500');
+
+            vennRight.classList.add('venn-active-right');
+            vennLeft.classList.remove('venn-active-left');
+            
+            vennDesc.innerHTML = "Връща всички редове от Дясната таблица (Б) и само съвпадащите редове от Лявата таблица (А). <br><span class='text-sm text-stone-500'>(Съвет: Почти винаги може да се пренапише като LEFT JOIN)</span>";
+            codeJoinType.textContent = "RIGHT JOIN";
+            codeJoinType.className = "text-green-400 font-bold";
+            hideResult();
+        });
+
+        const btnExecute = document.getElementById('btn-execute');
+        const resultContainer = document.getElementById('result-container');
+        const resultTbody = document.getElementById('result-tbody');
+        const resultNote = document.getElementById('result-note');
+
+        function hideResult() {
+            resultContainer.classList.add('hidden');
+            resultContainer.classList.remove('opacity-100');
+            resultContainer.classList.add('opacity-0');
+        }
+
+        btnExecute.addEventListener('click', () => {
+            resultTbody.innerHTML = '';
+            
+            if (currentJoinType === 'LEFT') {
+                dataStudents.forEach(student => {
+                    const match = dataCards.find(c => c.studentId === student.id);
+                    const tr = document.createElement('tr');
+                    tr.classList.add('border-b');
+                    tr.innerHTML = `
+                        <td class="p-3">${student.name}</td>
+                        <td class="p-3 ${!match ? 'text-red-600 font-bold bg-red-50' : ''}">${match ? match.cardId : 'NULL'}</td>
+                    `;
+                    resultTbody.appendChild(tr);
+                });
+                resultNote.innerHTML = "<strong>Забележка:</strong> Петър присъства в резултата, въпреки че няма карта, като срещу името му стои <span class='text-red-600 font-bold'>NULL</span>.";
+            } else {
+                dataCards.forEach(card => {
+                    const match = dataStudents.find(s => s.id === card.studentId);
+                    const tr = document.createElement('tr');
+                    tr.classList.add('border-b');
+                    tr.innerHTML = `
+                        <td class="p-3">${match ? match.name : 'NULL'}</td>
+                        <td class="p-3">${card.cardId}</td>
+                    `;
+                    resultTbody.appendChild(tr);
+                });
+                resultNote.innerHTML = "<strong>Забележка:</strong> Тук виждаме само ученици, които ИМАТ карти, защото дясната таблица (Карти) води съединението и няма карти без собственици в нея.";
+            }
+
+            resultContainer.classList.remove('hidden');
+            setTimeout(() => {
+                resultContainer.classList.remove('opacity-0');
+                resultContainer.classList.add('opacity-100');
+            }, 50);
+        });
+
+        const toggleNull = document.getElementById('toggle-null');
+        const nullResult = document.getElementById('null-result');
+
+        toggleNull.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                nullResult.classList.remove('hidden');
+            } else {
+                nullResult.classList.add('hidden');
+            }
+        });
+
+        window.toggleAnswer = function(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        };
+
+        const ctx = document.getElementById('joinChart').getContext('2d');
+        const joinChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN'],
+                datasets: [{
+                    label: 'Брой върнати редове',
+                    data: [2, 3, 2],
+                    backgroundColor: [
+                        'rgba(168, 162, 158, 0.6)', 
+                        'rgba(59, 130, 246, 0.6)',  
+                        'rgba(34, 197, 94, 0.6)'    
+                    ],
+                    borderColor: [
+                        'rgb(168, 162, 158)',
+                        'rgb(59, 130, 246)',
+                        'rgb(34, 197, 94)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + ' реда';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        title: {
+                            display: true,
+                            text: 'Брой Редове'
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+
+</body>
 </html>
