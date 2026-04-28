@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок: Скаларни функции за дата</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1a5f7a;
+            --secondary-blue: #00af91;
+            --light-bg: #f4f7f6;
+            --dark-text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        /* Голям Хедър */
+        header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            border-left: 5px solid var(--secondary-blue);
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+
+        /* Стил за таблиците */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+        }
+
+        th {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover { background-color: #f9f9f9; }
+
+        code {
+            background: #eef2f3;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            color: #d63384;
+        }
+
+        /* Примерни блокове */
+        .example {
+            background: #2d3436;
+            color: #fab1a0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            margin: 20px 0;
+            border-left: 5px solid var(--secondary-blue);
+        }
+
+        /* Секция за проверка */
+        .quiz-box {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .check-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .check-btn:hover { background: var(--secondary-blue); }
+
+        .answer {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            color: #155724;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Скаларни функции. Работа с дати.</h1>
+    <p>Интерактивен урок по Бази данни </p>
+</header>
+
+<div class="container">
+
+    <div class="section">
+        <h2>1. Функции за текущо системно време</h2>
+        <p>Тези функции се използват за автоматично генериране на времеви отпечатъци (timestamps) при вмъкване на записи или за сравнение с текущия момент.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Функция</th>
+                    <th>Описание</th>
+                    <th>Резултат (пример)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>NOW()</code></td>
+                    <td>Връща текущата дата и час</td>
+                    <td>2026-04-29 10:45:01</td>
+                </tr>
+                <tr>
+                    <td><code>CURDATE()</code></td>
+                    <td>Връща само текущата дата</td>
+                    <td>2026-04-29</td>
+                </tr>
+                <tr>
+                    <td><code>CURTIME()</code></td>
+                    <td>Връща само текущия час</td>
+                    <td>10:45:01</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="quiz-box">
+            <p><strong><i class="fas fa-question-circle"></i> Задача:</strong> Напишете SQL заявка, която извежда само днешната дата.</p>
+            <button class="check-btn" onclick="toggle('ans1')">Провери</button>
+            <div id="ans1" class="answer"><code>SELECT CURDATE();</code></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. Извличане на части от дата</h2>
+        <p>Когато разполагаме със сложен тип данни (DATE/DATETIME), можем да изолираме само нужния ни компонент за анализи.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Функция</th>
+                    <th>Какво извлича?</th>
+                    <th>Пример</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>YEAR(date)</code></td>
+                    <td>Годината като число</td>
+                    <td><code>YEAR('2026-05-20')</code> → 2026</td>
+                </tr>
+                <tr>
+                    <td><code>MONTH(date)</code></td>
+                    <td>Месеца (1-12)</td>
+                    <td><code>MONTH('2026-05-20')</code> → 5</td>
+                </tr>
+                <tr>
+                    <td><code>DAY(date)</code></td>
+                    <td>Деня от месеца (1-31)</td>
+                    <td><code>DAY('2026-05-20')</code> → 20</td>
+                </tr>
+                <tr>
+                    <td><code>DAYNAME(date)</code></td>
+                    <td>Името на деня (текст)</td>
+                    <td><code>DAYNAME('2026-05-20')</code> → 'Wednesday'</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="example">
+            SELECT DAYNAME(OrderDate) AS 'Ден от седмицата' FROM Orders;
+        </div>
+
+        <div class="quiz-box">
+            <p><strong><i class="fas fa-question-circle"></i> Задача:</strong> Как ще филтрирате студенти, родени само през месец юни?</p>
+            <button class="check-btn" onclick="toggle('ans2')">Провери</button>
+            <div id="ans2" class="answer"><code>SELECT * FROM Students WHERE MONTH(BirthDate) = 6;</code></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>3. Изчисления и промени на дати</h2>
+        <p>Тези функции ни помагат да изчисляваме срокове за доставка, възраст на потребители или период на валидност.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Функция</th>
+                    <th>Действие</th>
+                    <th>Синтаксис</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>DATEDIFF(d1, d2)</code></td>
+                    <td>Разлика в дни (d1 - d2)</td>
+                    <td><code>DATEDIFF('2026-05-01', '2026-04-01')</code></td>
+                </tr>
+                <tr>
+                    <td><code>DATE_ADD(date, interval)</code></td>
+                    <td>Добавя време към дата</td>
+                    <td><code>DATE_ADD(date, INTERVAL 10 DAY)</code></td>
+                </tr>
+                <tr>
+                    <td><code>DATE_SUB(date, interval)</code></td>
+                    <td>Изважда време от дата</td>
+                    <td><code>DATE_SUB(date, INTERVAL 1 MONTH)</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="quiz-box">
+            <p><strong><i class="fas fa-question-circle"></i> Задача:</strong> Напишете заявка, която добавя 1 година към текущата дата.</p>
+            <button class="check-btn" onclick="toggle('ans3')">Провери</button>
+            <div id="ans3" class="answer"><code>SELECT DATE_ADD(CURDATE(), INTERVAL 1 YEAR);</code></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>4. Форматиране (Custom Output)</h2>
+        <p>Чрез <code>DATE_FORMAT</code> можем да превърнем стандартното <code>YYYY-MM-DD</code> в по-лесен за четене формат.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Спецификатор</th>
+                    <th>Резултат</th>
+                    <th>Пример (%d.%m.%Y)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>%d</code></td>
+                    <td>Ден с водеща нула (01..31)</td>
+                    <td rowspan="3" style="vertical-align: middle; text-align: center; font-weight: bold;">29.04.2026</td>
+                </tr>
+                <tr>
+                    <td><code>%m</code></td>
+                    <td>Месец с водеща нула (01..12)</td>
+                </tr>
+                <tr>
+                    <td><code>%Y</code></td>
+                    <td>Година с 4 цифри</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="quiz-box">
+            <p><strong><i class="fas fa-question-circle"></i> Задача:</strong> Как ще изведете само годината от текущата дата чрез DATE_FORMAT?</p>
+            <button class="check-btn" onclick="toggle('ans4')">Провери</button>
+            <div id="ans4" class="answer"><code>SELECT DATE_FORMAT(NOW(), '%Y');</code></div>
+        </div>
+    </div>
+	<div class="section">
+        <h2>Обобщение</h2>
+ 	<p>Работата с дати е фундаментална за всеки бекенд разработчик. Чрез скаларните функции ние трансформираме суровите данни в полезна информация за потребителя.</p>
+            <ul>
+                <li>Използвайте <b>CURDATE()</b> за днешна дата.</li>
+                <li>Използвайте <b>DATEDIFF()</b> за изчисляване на периоди.</li>
+                <li>Използвайте <b>DATE_FORMAT()</b> за визуално оформяне.</li>
+            </ul>
+        </div>
+
+        
+
+
+</div>
+
+<footer>
+    <p style="text-align: center; margin-top: 50px; color: #7f8c8d;">
+       © 2026 Бази данни. инж. Полина Кирилова-Михова
+    </p>
+</footer>
+
+<script>
+    function toggle(id) {
+        var x = document.getElementById(id);
+        if (x.style.display === "none" || x.style.display === "") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>
