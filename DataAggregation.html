@@ -1,168 +1,194 @@
-
+<!DOCTYPE html>
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Урок: Агрегиращи функции</title>
+    <title>SQL Урок: Пълен курс по Агрегиране и Групиране</title>
     
-    <!-- Зареждане на Tailwind CSS чрез CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Зареждане на React и ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Зареждане на Babel за JSX поддръжка -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .sql-gradient { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        .terminal-bg { background: #1a1a1a; }
+        .sql-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
     </style>
 </head>
 <body class="bg-slate-50">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState } = React;
 
-        // Икони в SVG формат (за да работят без външни зависимости)
-        const IconCalc = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
-        );
+        // Икони
+        const IconCalc = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>);
+        const IconVs = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="m17 7-5-5-5 5"/><path d="m17 17-5 5-5-5"/></svg>);
+        const IconLayers = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>);
+        const IconAlert = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>);
 
         const App = () => {
             const [activeTab, setActiveTab] = useState('theory');
-            const [selectedFunc, setSelectedFunc] = useState(null);
-            const [queryResult, setQueryResult] = useState(null);
+            const [selectedScenario, setSelectedScenario] = useState(null);
 
             const inventory = [
                 { id: 1, name: 'Лаптоп Pro', category: 'Електроника', price: 2500, stock: 15 },
                 { id: 2, name: 'Мишка Wireless', category: 'Аксесоари', price: 45, stock: 120 },
                 { id: 3, name: 'Монитор 27"', category: 'Електроника', price: 600, stock: 8 },
-                { id: 4, name: 'Клавиатура RGB', category: 'Аксесоари', price: 120, stock: 45 },
-                { id: 5, name: 'Слушалки', category: 'Аудио', price: 180, stock: 30 }
+                { id: 4, name: 'Стикер', category: 'Маркетинг', price: 5, stock: 500 },
+                { id: 5, name: 'Слушалки', category: 'Аксесоари', price: 180, stock: 40 }
             ];
 
-            const functions = [
-                { name: 'COUNT', desc: 'Брои броя на редовете', syntax: 'SELECT COUNT(*) FROM products;', details: 'Връща общия брой записи.' },
-                { name: 'SUM', desc: 'Сумира стойностите', syntax: 'SELECT SUM(stock) FROM products;', details: 'Събира наличностите на всички продукти.' },
-                { name: 'AVG', desc: 'Средна стойност', syntax: 'SELECT AVG(price) FROM products;', details: 'Изчислява средната цена на артикулите.' },
-                { name: 'MIN', desc: 'Минимална стойност', syntax: 'SELECT MIN(price) FROM products;', details: 'Намира най-ниската цена в таблицата.' },
-                { name: 'MAX', desc: 'Максимална стойност', syntax: 'SELECT MAX(price) FROM products;', details: 'Намира най-високата цена в таблицата.' }
+            const basicFunctions = [
+                { name: 'COUNT', desc: 'Брои редовете', syntax: 'SELECT COUNT(*) FROM products;' },
+                { name: 'SUM', desc: 'Сумира стойности', syntax: 'SELECT SUM(stock) FROM products;' },
+                { name: 'AVG', desc: 'Средна стойност', syntax: 'SELECT AVG(price) FROM products;' },
+                { name: 'MIN/MAX', desc: 'Минимум и максимум', syntax: 'SELECT MIN(price), MAX(price) FROM products;' }
             ];
 
-            const runExample = (fName) => {
-                setSelectedFunc(fName);
-                let res;
-                const p = inventory.map(x => x.price);
-                const s = inventory.map(x => x.stock);
-
-                if (fName === 'COUNT') res = inventory.length;
-                else if (fName === 'SUM') res = s.reduce((a, b) => a + b, 0);
-                else if (fName === 'AVG') res = (p.reduce((a, b) => a + b, 0) / p.length).toFixed(2);
-                else if (fName === 'MIN') res = Math.min(...p);
-                else if (fName === 'MAX') res = Math.max(...p);
-                
-                setQueryResult(res);
+            const scenarios = {
+                'GROUP_BY_BASIC': {
+                    title: 'Основи на GROUP BY',
+                    concept: 'Разделя редовете на групи по категория.',
+                    sql: "SELECT category, COUNT(*) \nFROM products \nGROUP BY category;",
+                    result: [
+                        { col1: 'Електроника', col2: '2' },
+                        { col1: 'Аксесоари', col2: '2' },
+                        { col1: 'Маркетинг', col2: '1' }
+                    ],
+                    note: 'SQL разделя таблицата на малки под-таблици за всяка категория и брои редовете в тях.'
+                },
+                'WHERE_VS_HAVING': {
+                    title: 'WHERE и HAVING заедно',
+                    concept: 'Използваме WHERE за индивидуални редове и HAVING за групите.',
+                    sql: "SELECT category, SUM(stock)\nFROM products\nWHERE price > 100\nGROUP BY category\nHAVING SUM(stock) > 20;",
+                    result: [
+                        { col1: 'Аксесоари', col2: '40' }
+                    ],
+                    note: 'WHERE премахва евтините предмети преди групирането. HAVING филтрира вече сметнатите суми.'
+                }
             };
 
             return (
-                <div className="max-w-5xl mx-auto p-4 md:p-10">
+                <div className="max-w-6xl mx-auto p-4 md:p-10">
                     <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="flex items-center gap-4">
-                            <div className="bg-indigo-600 p-4 rounded-3xl text-white shadow-xl shadow-indigo-200">
+                            <div className="bg-indigo-600 p-4 rounded-3xl text-white shadow-xl shadow-indigo-100">
                                 <IconCalc />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-black text-slate-900 leading-none">SQL АГРЕГАЦИЯ</h1>
-                                <p className="text-slate-500 font-medium mt-2 uppercase text-xs tracking-widest">Интерактивен модул за обучение</p>
+                                <h1 className="text-3xl font-black text-slate-900 leading-none tracking-tight uppercase">SQL Aggregation Master</h1>
+                                <p className="text-slate-500 font-medium mt-2 uppercase text-[10px] tracking-[0.3em] italic">Functions • Group By • Having</p>
                             </div>
                         </div>
                         
                         <div className="flex gap-2 p-1.5 bg-slate-200 rounded-2xl w-fit">
-                            <button 
-                                onClick={() => setActiveTab('theory')} 
-                                className={`px-8 py-2.5 rounded-xl font-bold transition-all text-sm ${activeTab === 'theory' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'}`}
-                            >
-                                Урок
-                            </button>
-                            <button 
-                                onClick={() => setActiveTab('lab')} 
-                                className={`px-8 py-2.5 rounded-xl font-bold transition-all text-sm ${activeTab === 'lab' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'}`}
-                            >
-                                Лаборатория
-                            </button>
+                            <button onClick={() => setActiveTab('theory')} className={`px-8 py-2.5 rounded-xl font-bold transition-all text-sm ${activeTab === 'theory' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600'}`}>Урок</button>
+                            <button onClick={() => setActiveTab('lab')} className={`px-8 py-2.5 rounded-xl font-bold transition-all text-sm ${activeTab === 'lab' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600'}`}>Практика</button>
                         </div>
                     </header>
 
                     {activeTab === 'theory' ? (
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                            <div className="lg:col-span-7 space-y-6">
-                                <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
-                                    <h2 className="text-2xl font-bold mb-6 text-slate-800">Какво са агрегиращите функции?</h2>
-                                    <p className="text-slate-600 leading-relaxed mb-6">
-                                        Това са специални инструменти в SQL, които обработват множество редове и връщат <strong>един единствен резултат</strong>. Те се използват за генериране на отчети и анализи.
-                                    </p>
-                                    <div className="space-y-3">
-                                        {functions.map(f => (
-                                            <div key={f.name} className="group p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all">
-                                                <div className="flex items-center justify-between mb-1">
-                                                    <span className="font-black text-indigo-600 tracking-tight">{f.name}()</span>
-                                                    <code className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold uppercase">Синтаксис</code>
-                                                </div>
-                                                <p className="text-sm text-slate-700 font-medium mb-2">{f.desc}</p>
-                                                <div className="bg-slate-800 p-2 rounded-lg text-indigo-300 font-mono text-xs">
-                                                    {f.syntax}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                        <div className="space-y-12 animate-in fade-in duration-500">
+                            {/* Функции */}
+                            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                                <h2 className="text-2xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                                    <IconCalc className="text-indigo-600" />
+                                    1. Агрегиращи функции
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {basicFunctions.map(f => (
+                                        <div key={f.name} className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                                            <div className="font-black text-indigo-600 mb-1">{f.name}()</div>
+                                            <p className="text-xs text-slate-500 mb-3">{f.desc}</p>
+                                            <code className="text-[10px] bg-slate-800 text-indigo-200 p-2 rounded-lg block">
+                                                {f.syntax}
+                                            </code>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                            
-                            <div className="lg:col-span-5">
-                                <div className="sql-gradient p-8 rounded-[2rem] text-white shadow-2xl sticky top-8">
-                                    <h3 className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-8">Примерен сценарий</h3>
-                                    <div className="font-mono text-sm space-y-4 mb-10 text-indigo-100">
-                                        <p><span className="text-pink-400">SELECT</span> <span className="text-indigo-300">MAX</span>(price)</p>
-                                        <p><span className="text-pink-400">FROM</span> products</p>
-                                        <p><span className="text-pink-400">WHERE</span> stock > <span className="text-emerald-400">0</span>;</p>
-                                    </div>
-                                    <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
-                                        <p className="text-xs text-indigo-300 mb-2 font-bold italic">Обяснение:</p>
-                                        <p className="text-sm leading-relaxed opacity-80">
-                                            Тази заявка намира най-високата цена (MAX) от всички продукти, които в момента са налични в склада.
-                                        </p>
-                                    </div>
+
+                            {/* Сравнение WHERE vs HAVING */}
+                            <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                                <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
+                                    <IconVs className="text-rose-500" />
+                                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-widest">WHERE срещу HAVING</h2>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-white">
+                                                <th className="p-6 text-[10px] font-black text-slate-400 uppercase border-b border-slate-100">Характеристика</th>
+                                                <th className="p-6 text-sm font-black text-indigo-600 uppercase border-b border-slate-100 bg-indigo-50/30 text-center">WHERE</th>
+                                                <th className="p-6 text-sm font-black text-emerald-600 uppercase border-b border-slate-100 bg-emerald-50/30 text-center">HAVING</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-sm divide-y divide-slate-50">
+                                            <tr>
+                                                <td className="p-6 font-bold text-slate-700 bg-slate-50/30 italic">Изпълнение</td>
+                                                <td className="p-6 text-center text-slate-600">Преди GROUP BY</td>
+                                                <td className="p-6 text-center text-slate-600 font-medium">След GROUP BY</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-6 font-bold text-slate-700 bg-slate-50/30 italic">Приложение</td>
+                                                <td className="p-6 text-center text-slate-600 underline decoration-indigo-200">Индивидуални редове</td>
+                                                <td className="p-6 text-center text-slate-600 underline decoration-emerald-200 font-medium">Цели групи</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-6 font-bold text-slate-700 bg-slate-50/30 italic">Функции</td>
+                                                <td className="p-6 text-center">
+                                                    <span className="text-rose-500 font-black">X</span> (Недопустимо)
+                                                </td>
+                                                <td className="p-6 text-center">
+                                                    <span className="text-emerald-500 font-black">✓</span> (Допустимо)
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Ред на изпълнение */}
+                            <div className="bg-slate-900 rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden">
+                                <h3 className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mb-10 text-center italic">Log of Execution (SQL Pipeline)</h3>
+                                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                                    <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700 text-center w-full md:w-32 opacity-50 text-xs">FROM</div>
+                                    <div className="hidden md:block text-slate-700">→</div>
+                                    <div className="p-5 bg-indigo-600 rounded-2xl border-2 border-indigo-400 text-center w-full md:w-40 font-black shadow-lg shadow-indigo-500/20">WHERE</div>
+                                    <div className="hidden md:block text-indigo-400 animate-pulse">→</div>
+                                    <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700 text-center w-full md:w-32 opacity-50 text-xs">GROUP BY</div>
+                                    <div className="hidden md:block text-emerald-400 animate-pulse">→</div>
+                                    <div className="p-5 bg-emerald-600 rounded-2xl border-2 border-emerald-400 text-center w-full md:w-40 font-black shadow-lg shadow-emerald-500/20">HAVING</div>
+                                    <div className="hidden md:block text-slate-700">→</div>
+                                    <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700 text-center w-full md:w-32 opacity-50 text-xs">SELECT</div>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-8">
-                            <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
-                                <div className="flex items-center gap-2 mb-6 px-2">
-                                    <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
-                                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">Таблица: products</h3>
-                                </div>
+                        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+                            {/* Таблица */}
+                            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-2 italic">Инвентар: products</h3>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="text-slate-400 text-xs uppercase">
-                                                <th className="pb-4 px-4 text-left">Продукт</th>
-                                                <th className="pb-4 px-4 text-left">Категория</th>
-                                                <th className="pb-4 px-4 text-right">Цена</th>
-                                                <th className="pb-4 px-4 text-right">Наличност</th>
+                                        <thead className="bg-slate-50 text-slate-400 text-[10px] uppercase font-black">
+                                            <tr>
+                                                <th className="py-3 px-4 text-left">Продукт</th>
+                                                <th className="py-3 px-4 text-left">Категория</th>
+                                                <th className="py-3 px-4 text-right">Цена</th>
+                                                <th className="py-3 px-4 text-right">Stock</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
                                             {inventory.map(p => (
-                                                <tr key={p.id} className="hover:bg-slate-50 group transition-colors">
-                                                    <td className="py-4 px-4 font-bold text-slate-800">{p.name}</td>
-                                                    <td className="py-4 px-4"><span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase">{p.category}</span></td>
-                                                    <td className="py-4 px-4 text-right text-indigo-600 font-black">{p.price.toFixed(2)} лв.</td>
-                                                    <td className="py-4 px-4 text-right font-mono">{p.stock}</td>
+                                                <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                                                    <td className="py-3 px-4 font-bold text-slate-700">{p.name}</td>
+                                                    <td className="py-3 px-4 text-slate-500">{p.category}</td>
+                                                    <td className="py-3 px-4 text-right font-mono text-indigo-600">{p.price.toFixed(2)}</td>
+                                                    <td className="py-3 px-4 text-right font-mono font-bold">{p.stock}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -170,67 +196,57 @@
                                 </div>
                             </div>
 
-                            <div className="flex flex-col lg:flex-row gap-8">
-                                <div className="lg:w-1/3 grid grid-cols-1 gap-3">
-                                    {functions.map(f => (
-                                        <button 
-                                            key={f.name} 
-                                            onClick={() => runExample(f.name)} 
-                                            className={`p-5 rounded-2xl border-2 transition-all flex items-center justify-between group ${selectedFunc === f.name ? 'border-indigo-600 bg-indigo-50 shadow-lg translate-x-2' : 'border-white bg-white hover:border-slate-200 shadow-sm'}`}
-                                        >
-                                            <span className={`font-black tracking-tighter text-lg ${selectedFunc === f.name ? 'text-indigo-600' : 'text-slate-400'}`}>{f.name}()</span>
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${selectedFunc === f.name ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-300'}`}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="lg:w-2/3 h-full min-h-[400px]">
-                                    {selectedFunc ? (
-                                        <div className="sql-gradient rounded-[2.5rem] p-10 text-white shadow-2xl flex flex-col h-full border-4 border-slate-800 animate-in fade-in zoom-in duration-300">
-                                            <div className="flex items-center gap-2 mb-8 text-indigo-400">
-                                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                                <span className="text-[10px] font-black uppercase tracking-[0.3em]">SQL Execution Engine</span>
-                                            </div>
-                                            
-                                            <div className="font-mono text-xl md:text-2xl mb-12 space-y-2">
-                                                <p><span className="text-pink-400">SELECT</span> <span className="text-indigo-300">{selectedFunc === 'COUNT' ? 'COUNT(*)' : `${selectedFunc}(${selectedFunc === 'SUM' ? 'stock' : 'price'})`}</span></p>
-                                                <p><span className="text-pink-400">FROM</span> products;</p>
-                                            </div>
-
-                                            <div className="mt-auto">
-                                                <p className="text-[10px] text-slate-500 font-black uppercase mb-4 tracking-widest">Console Output</p>
-                                                <div className="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
-                                                    <div className="text-7xl font-black text-white flex items-baseline gap-4">
-                                                        {queryResult}
-                                                        <span className="text-xl font-normal text-indigo-400 uppercase tracking-widest">
-                                                            {selectedFunc === 'COUNT' ? 'реда' : selectedFunc === 'SUM' ? 'бр.' : 'лв.'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <p className="mt-6 text-indigo-300/50 italic text-sm">
-                                                    {functions.find(f => f.name === selectedFunc).details}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="h-full border-4 border-dashed border-slate-200 rounded-[2.5rem] flex flex-col items-center justify-center p-10 text-center space-y-4">
-                                            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-2">
-                                                <IconCalc />
-                                            </div>
-                                            <h4 className="text-slate-400 font-black uppercase tracking-widest text-sm">Готовност за работа</h4>
-                                            <p className="text-slate-400 text-sm max-w-xs">Изберете агрегираща функция отляво, за да стартирате симулация на SQL сървър.</p>
-                                        </div>
-                                    )}
-                                </div>
+                            {/* Избор на сценарий */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {Object.keys(scenarios).map(key => (
+                                    <button 
+                                        key={key} 
+                                        onClick={() => setSelectedScenario(key)}
+                                        className={`p-6 rounded-[2rem] border-2 text-left transition-all ${selectedScenario === key ? 'border-indigo-600 bg-indigo-50 shadow-lg scale-[1.02]' : 'border-white bg-white hover:border-indigo-100 shadow-sm'}`}
+                                    >
+                                        <h4 className="font-black text-slate-800 mb-1 uppercase tracking-tighter">{scenarios[key].title}</h4>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Интерактивен пример</p>
+                                    </button>
+                                ))}
                             </div>
+
+                            {selectedScenario && (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in zoom-in-95 duration-300">
+                                    <div className="terminal-bg rounded-[2.5rem] p-10 shadow-2xl font-mono border-t-[14px] border-slate-800">
+                                        <div className="text-indigo-500 text-[10px] mb-8 font-black uppercase tracking-[0.4em]">SQL Query</div>
+                                        <pre className="text-indigo-100 text-sm whitespace-pre-wrap leading-relaxed">
+                                            {scenarios[selectedScenario].sql}
+                                        </pre>
+                                    </div>
+
+                                    <div className="bg-white rounded-[2.5rem] p-10 border border-slate-200 flex flex-col justify-between">
+                                        <div>
+                                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 italic underline">Output:</h4>
+                                            <div className="bg-slate-50 rounded-2xl p-8 border border-slate-100 min-h-[140px] flex items-center justify-center">
+                                                <table className="w-full text-sm">
+                                                    <thead>
+                                                        <tr className="text-slate-400 text-[10px] font-black uppercase border-b border-slate-200">
+                                                            <th className="pb-3 text-left">Category</th>
+                                                            <th className="pb-3 text-right">Result</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {scenarios[selectedScenario].result.map((r, i) => (
+                                                            <tr key={i}><td className="py-3 font-bold">{r.col1}</td><td className="py-3 text-right text-indigo-600 font-black text-xl">{r.col2}</td></tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div className="mt-8 p-6 bg-amber-50 rounded-2xl border border-amber-100 flex gap-4 text-xs">
+                                            <div className="shrink-0 w-8 h-8 bg-amber-500 text-white rounded-lg flex items-center justify-center font-black">?</div>
+                                            <p className="text-amber-900 leading-relaxed italic">{scenarios[selectedScenario].note}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
-
-                    <footer className="mt-20 pt-8 border-t border-slate-200 text-center">
-                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.4em]">SQL Learning Series • 2026</p>
-                    </footer>
                 </div>
             );
         };
